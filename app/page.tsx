@@ -155,7 +155,7 @@ const formSchema = z
     equipoAF: z.string(),
     equipoEC: z.string(),
     mejorOradorId: z.string().optional(),
-    mejorIntoductorId: z.string().optional(),
+    mejorIntroductorId: z.string().optional(),
     mejorR1Id: z.string().optional(),
     mejorR2Id: z.string().optional(),
     mejorConcluId: z.string().optional(),
@@ -263,7 +263,7 @@ export default function Home() {
       equipoAF: "",
       equipoEC: "",
       mejorOradorId: undefined,
-      mejorIntoductorId: undefined,
+      mejorIntroductorId: undefined,
       mejorR1Id: undefined,
       mejorR2Id: undefined,
       mejorConcluId: undefined,
@@ -427,7 +427,7 @@ export default function Home() {
       form.reset({
         ...form.getValues(),
         mejorOradorId: undefined,
-        mejorIntoductorId: undefined,
+        mejorIntroductorId: undefined,
         mejorR1Id: undefined,
         mejorR2Id: undefined,
         mejorConcluId: undefined,
@@ -584,7 +584,7 @@ export default function Home() {
           />
           <FormField
             control={form.control}
-            name="mejorIntoductorId"
+            name="mejorIntroductorId"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Mejor Introductor</FormLabel>

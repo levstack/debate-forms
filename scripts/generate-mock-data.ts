@@ -138,7 +138,7 @@ function generateMockDebates(teams: any[]) {
         equipoAF: afTeam.name,
         equipoEC: ecTeam.name,
         mejorOradorId: getRandomMember(afTeam, ecTeam),
-        mejorIntoductorId: getRandomMember(afTeam, ecTeam),
+        mejorIntroductorId: getRandomMember(afTeam, ecTeam),
         mejorR1Id: getRandomMember(afTeam, ecTeam),
         mejorR2Id: getRandomMember(afTeam, ecTeam),
         mejorConcluId: getRandomMember(afTeam, ecTeam),
@@ -302,7 +302,7 @@ async function main() {
         data: {
           debateId: debate.id,
           mejorOradorId: debateData.mejorOradorId,
-          mejorIntoductorId: debateData.mejorIntoductorId,
+          mejorIntroductorId: debateData.mejorIntroductorId,
           mejorR1Id: debateData.mejorR1Id,
           mejorR2Id: debateData.mejorR2Id,
           mejorConcluId: debateData.mejorConcluId,

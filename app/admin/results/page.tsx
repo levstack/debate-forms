@@ -29,7 +29,7 @@ interface Result {
   mejorOrador?: {
     name: string;
   };
-  mejorIntoductor?: {
+  mejorIntroductor?: {
     name: string;
   };
   mejorR1?: {
@@ -170,7 +170,7 @@ export default function ResultsPage() {
                     {result.mejorOrador?.name || "No seleccionado"}
                   </TableCell>
                   <TableCell>
-                    {result.mejorIntoductor?.name || "No seleccionado"}
+                    {result.mejorIntroductor?.name || "No seleccionado"}
                   </TableCell>
                   <TableCell>
                     {result.mejorR1?.name || "No seleccionado"}

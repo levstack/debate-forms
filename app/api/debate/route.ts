@@ -10,7 +10,7 @@ const formSchema = z.object({
   equipoAF: z.string(),
   equipoEC: z.string(),
   mejorOradorId: z.string().optional(),
-  mejorIntoductorId: z.string().optional(),
+  mejorIntroductorId: z.string().optional(),
   mejorR1Id: z.string().optional(),
   mejorR2Id: z.string().optional(),
   mejorConcluId: z.string().optional(),
@@ -38,7 +38,7 @@ export async function GET() {
           include: {
             evaluations: true,
             mejorOrador: true,
-            mejorIntoductor: true,
+            mejorIntroductor: true,
             mejorR1: true,
             mejorR2: true,
             mejorConclu: true,

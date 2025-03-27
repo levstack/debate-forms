@@ -8,7 +8,7 @@ const formSchema = z.object({
   equipoAF: z.string(),
   equipoEC: z.string(),
   mejorOradorId: z.string().optional(),
-  mejorIntoductorId: z.string().optional(),
+  mejorIntroductorId: z.string().optional(),
   mejorR1Id: z.string().optional(),
   mejorR2Id: z.string().optional(),
   mejorConcluId: z.string().optional(),
@@ -58,7 +58,7 @@ export async function saveDebateResult(formData: FormData) {
     data: {
       debateId: debate.id,
       mejorOradorId: formData.mejorOradorId,
-      mejorIntoductorId: formData.mejorIntoductorId,
+      mejorIntroductorId: formData.mejorIntroductorId,
       mejorR1Id: formData.mejorR1Id,
       mejorR2Id: formData.mejorR2Id,
       mejorConcluId: formData.mejorConcluId,

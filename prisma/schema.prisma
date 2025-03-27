@@ -28,7 +28,7 @@ model TeamMember {
   teamId        String
   roles         TeamRole[]
   mejorOradorIn Result[]   @relation("MejorOrador")
-  mejorIntoductorIn Result[]   @relation("MejorIntoductor")
+  mejorIntroductorIn Result[]   @relation("MejorIntroductor")
   mejorR1In Result[]   @relation("MejorR1")
   mejorR2In Result[]   @relation("MejorR2")
   mejorConcluIn Result[]   @relation("MejorConclu")
@@ -83,13 +83,13 @@ model Result {
 
 //Mejores Posiciones
   mejorOrador   TeamMember?  @relation("MejorOrador", fields: [mejorOradorId], references: [id])
-  mejorIntoductor TeamMember?  @relation("MejorIntoductor", fields: [mejorIntoductorId], references: [id])
+  mejorIntroductor TeamMember?  @relation("MejorIntroductor", fields: [mejorIntroductorId], references: [id])
   mejorR1 TeamMember?  @relation("MejorR1", fields: [mejorR1Id], references: [id])
   mejorR2 TeamMember?  @relation("MejorR2", fields: [mejorR2Id], references: [id])
   mejorConclu TeamMember?  @relation("MejorConclu", fields: [mejorConcluId], references: [id])
  
   mejorOradorId String?
-  mejorIntoductorId String?
+  mejorIntroductorId String?
   mejorR1Id String?
   mejorR2Id String?
   mejorConcluId String?

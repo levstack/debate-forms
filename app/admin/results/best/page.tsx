@@ -22,49 +22,26 @@ export default function BestResultsPage() {
   useEffect(() => {
     async function fetchAllResults() {
       try {
-        const [oradoresRes, introducersRes, r1Res, r2Res, concluRes] =
-          await Promise.all([
-            fetch("/api/best-oradores"),
-            fetch("/api/best-introducers"),
-            fetch("/api/best-r1"),
-            fetch("/api/best-r2"),
-            fetch("/api/best-conclu"),
-          ]);
+        const categories = ["oradores", "introductores", "r1", "r2", "conclu"];
+        const responses = await Promise.all(
+          categories.map((category) => fetch(`/api/best/${category}`))
+        );
 
-        if (
-          !oradoresRes.ok ||
-          !introducersRes.ok ||
-          !r1Res.ok ||
-          !r2Res.ok ||
-          !concluRes.ok
-        ) {
+        if (responses.some((res) => !res.ok)) {
           throw new Error("Failed to fetch results");
         }
 
-        const [oradoresData, introducersData, r1Data, r2Data, concluData] =
-          await Promise.all([
-            oradoresRes.json(),
-            introducersRes.json(),
-            r1Res.json(),
-            r2Res.json(),
-            concluRes.json(),
-          ]);
+        const results = await Promise.all(responses.map((res) => res.json()));
 
-        if (
-          !oradoresData.success ||
-          !introducersData.success ||
-          !r1Data.success ||
-          !r2Data.success ||
-          !concluData.success
-        ) {
+        if (results.some((data) => !data.success)) {
           throw new Error("Failed to fetch results");
         }
 
-        setTopOradores(oradoresData.oradores);
-        setTopIntroducers(introducersData.introducers);
-        setTopR1(r1Data.r1);
-        setTopR2(r2Data.r2);
-        setTopConclu(concluData.conclu);
+        setTopOradores(results[0].oradores);
+        setTopIntroducers(results[1].introductores);
+        setTopR1(results[2].r1);
+        setTopR2(results[3].r2);
+        setTopConclu(results[4].conclu);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error occurred");
         console.error("Error fetching results:", err);
