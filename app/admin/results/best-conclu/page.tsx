@@ -44,7 +44,7 @@ export default function BestConcluPage() {
 
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-8">Mejores Concluyentes</h1>
+      <h1 className="text-3xl font-bold mb-8">Mejores Conclusores</h1>
       {loading ? (
         <p>Cargando...</p>
       ) : error ? (
@@ -52,10 +52,10 @@ export default function BestConcluPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <LeaderboardCard
-            title="Mejores Concluyentes"
+            title="Mejores Conclusores"
             data={topConclu}
             iconColor="text-purple-500"
-            caption="Top 5 Concluyentes más mencionados"
+            caption="Top 5 conclusores más mencionados"
           />
         </div>
       )}

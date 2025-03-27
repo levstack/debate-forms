@@ -87,10 +87,10 @@ export default function BestResultsPage() {
             caption="Top 5 R2 más mencionados"
           />
           <LeaderboardCard
-            title="Mejores Concluyentes"
+            title="Mejores Conclusores"
             data={topConclu}
             iconColor="text-purple-500"
-            caption="Top 5 Concluyentes más mencionados"
+            caption="Top 5 conclusores más mencionados"
           />
         </div>
       )}

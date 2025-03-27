@@ -467,9 +467,10 @@ export default function Home() {
             name="ronda"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Ronda</FormLabel>
+                <FormLabel htmlFor="ronda">Ronda</FormLabel>
                 <FormControl>
                   <Input
+                    id="ronda"
                     type="number"
                     min={1}
                     onChange={(e) => {
@@ -486,9 +487,10 @@ export default function Home() {
             name="aula"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Aula</FormLabel>
+                <FormLabel htmlFor="aula">Aula</FormLabel>
                 <FormControl>
                   <Input
+                    id="aula"
                     type="number"
                     min={1}
                     onChange={(e) => {
@@ -505,10 +507,10 @@ export default function Home() {
             name="equipoAF"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Equipo AF</FormLabel>
+                <FormLabel htmlFor="equipoAF">Equipo AF</FormLabel>
                 <FormControl>
                   <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger>
+                    <SelectTrigger id="equipoAF">
                       <SelectValue placeholder="Selecciona un equipo" />
                     </SelectTrigger>
                     <SelectContent>
@@ -528,14 +530,14 @@ export default function Home() {
             name="equipoEC"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Equipo EC</FormLabel>
+                <FormLabel htmlFor="equipoEC">Equipo EC</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                     disabled={!form.getValues("equipoAF")}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="equipoEC">
                       <SelectValue placeholder="Selecciona un equipo" />
                     </SelectTrigger>
                     <SelectContent>
@@ -560,14 +562,14 @@ export default function Home() {
             name="mejorOradorId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mejor Orador</FormLabel>
+                <FormLabel htmlFor="mejorOrador">Mejor Orador</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                     disabled={eligibleOrators.length === 0}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="mejorOrador">
                       <SelectValue placeholder="Selecciona el mejor orador" />
                     </SelectTrigger>
                     <SelectContent>
@@ -587,14 +589,16 @@ export default function Home() {
             name="mejorIntroductorId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mejor Introductor</FormLabel>
+                <FormLabel htmlFor="mejorIntroductor">
+                  Mejor Introductor
+                </FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                     disabled={roleMembers.INTRO.length === 0}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="mejorIntroductor">
                       <SelectValue placeholder="Selecciona el mejor introductor" />
                     </SelectTrigger>
                     <SelectContent>
@@ -614,14 +618,14 @@ export default function Home() {
             name="mejorR1Id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mejor R1</FormLabel>
+                <FormLabel htmlFor="mejorR1">Mejor R1</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                     disabled={roleMembers.R1.length === 0}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="mejorR1">
                       <SelectValue placeholder="Selecciona el mejor R1" />
                     </SelectTrigger>
                     <SelectContent>
@@ -641,14 +645,14 @@ export default function Home() {
             name="mejorR2Id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mejor R2</FormLabel>
+                <FormLabel htmlFor="mejorR2">Mejor R2</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                     disabled={roleMembers.R2.length === 0}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="mejorR2">
                       <SelectValue placeholder="Selecciona el mejor R2" />
                     </SelectTrigger>
                     <SelectContent>
@@ -668,14 +672,14 @@ export default function Home() {
             name="mejorConcluId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Mejor Conclusión</FormLabel>
+                <FormLabel htmlFor="mejorConclu">Mejor Conclusión</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
                     disabled={roleMembers.CONCLU.length === 0}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="mejorConclu">
                       <SelectValue placeholder="Selecciona el mejor conclusor" />
                     </SelectTrigger>
                     <SelectContent>
