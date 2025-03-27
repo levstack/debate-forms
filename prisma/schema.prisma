@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  INTRO
+  R1
+  R2
+  CONCLU
+  CAPITAN
+}
+
+model TeamMember {
+  id            String     @id @default(cuid())
+  name          String
+  team          Team       @relation(fields: [teamId], references: [id])
+  teamId        String
+  roles         TeamRole[]
+  mejorOradorIn Result[]   @relation("MejorOrador")
+  mejorIntoductorIn Result[]   @relation("MejorIntoductor")
+  mejorR1In Result[]   @relation("MejorR1")
+  mejorR2In Result[]   @relation("MejorR2")
+  mejorConcluIn Result[]   @relation("MejorConclu")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([name, teamId])
+}
+
+model TeamRole {
+  id        String     @id @default(cuid())
+  role      Role
+  teamType  TeamType // AF or EC
+  member    TeamMember @relation(fields: [memberId], references: [id])
+  memberId  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([role, teamType, memberId])
+}
+
+model Team {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  members     TeamMember[]
+  debatesAsAF Debate[]     @relation("AFTeam")
+  debatesAsEC Debate[]     @relation("ECTeam")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Debate {
+  id        String   @id @default(cuid())
+  ronda     Int
+  aula      Int
+  teamAF    Team     @relation("AFTeam", fields: [teamAFId], references: [id])
+  teamAFId  String
+  teamEC    Team     @relation("ECTeam", fields: [teamECId], references: [id])
+  teamECId  String
+  results   Result[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([ronda, aula], name: "ronda_aula")
+}
+
+model Result {
+  id            String       @id @default(cuid())
+  debate        Debate       @relation(fields: [debateId], references: [id])
+  debateId      String
+  evaluations   Evaluation[]
+
+//Mejores Posiciones
+  mejorOrador   TeamMember?  @relation("MejorOrador", fields: [mejorOradorId], references: [id])
+  mejorIntoductor TeamMember?  @relation("MejorIntoductor", fields: [mejorIntoductorId], references: [id])
+  mejorR1 TeamMember?  @relation("MejorR1", fields: [mejorR1Id], references: [id])
+  mejorR2 TeamMember?  @relation("MejorR2", fields: [mejorR2Id], references: [id])
+  mejorConclu TeamMember?  @relation("MejorConclu", fields: [mejorConcluId], references: [id])
+ 
+  mejorOradorId String?
+  mejorIntoductorId String?
+  mejorR1Id String?
+  mejorR2Id String?
+  mejorConcluId String?
+
+
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Evaluation {
+  id        String   @id @default(cuid())
+  result    Result   @relation(fields: [resultId], references: [id])
+  resultId  String
+  category  Category
+  team      TeamType
+  criteria  String
+  score     Float
+  weight    Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Category {
+  FONDO
+  FORMA
+  OTROS
+}
+
+enum TeamType {
+  AF
+  EC
+}

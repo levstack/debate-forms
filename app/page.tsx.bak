@@ -12,7 +12,7 @@ import {
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Team, getAllTeams } from "@/lib/services/team-service";
 
@@ -39,99 +39,24 @@ interface EvaluationFieldProps {
   name: string;
 }
 
-const EvaluationField = ({ control, name }: EvaluationFieldProps) => {
-  const [displayValue, setDisplayValue] = useState<string>("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => {
-        // Initialize display value from the field value
-        useEffect(() => {
-          setDisplayValue(field.value.toString().replace(".", ","));
-        }, [field.value]);
-
-        // Handle increment/decrement
-        const handleStep = (increment: boolean) => {
-          const step = 0.1;
-          const currentValue = field.value as number;
-          let newValue = increment
-            ? Math.min(currentValue + step, 1)
-            : Math.max(currentValue - step, 0);
-
-          // Round to 1 decimal place to avoid floating point issues
-          newValue = Math.round(newValue * 10) / 10;
-          field.onChange(newValue);
-        };
-
-        return (
-          <div className="relative flex items-center">
-            <Input
-              ref={inputRef}
-              type="text"
-              value={displayValue}
-              onFocus={() => {
-                if (field.value === 0) {
-                  setDisplayValue("0,");
-                }
-              }}
-              onBlur={() => {
-                const valueForParsing = displayValue.replace(",", ".");
-                const numValue = parseFloat(valueForParsing);
-                const clampedValue = Math.min(
-                  Math.max(isNaN(numValue) ? 0 : numValue, 0),
-                  1
-                );
-                field.onChange(clampedValue);
-                setDisplayValue(clampedValue.toString().replace(".", ","));
-              }}
-              onChange={(e) => {
-                const inputValue = e.target.value;
-                const normalizedInput = inputValue.replace(".", ",");
-                if (/^[0-9]*,?[0-9]*$/.test(normalizedInput)) {
-                  setDisplayValue(normalizedInput);
-                  const valueForParsing = normalizedInput.replace(",", ".");
-                  const numValue = parseFloat(valueForParsing);
-                  if (!isNaN(numValue)) {
-                    field.onChange(numValue);
-                  }
-                }
-              }}
-              min={0}
-              max={1}
-              step={0.1}
-              className="w-20 pr-8"
-            />
-            <div className="absolute right-1 top-1 flex flex-col h-[calc(100%-8px)]">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-4 w-4 p-0 hover:bg-transparent"
-                onClick={() => handleStep(true)}
-                tabIndex={-1}
-              >
-                ▲
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-4 w-4 p-0 hover:bg-transparent"
-                onClick={() => handleStep(false)}
-                tabIndex={-1}
-              >
-                ▼
-              </Button>
-            </div>
-          </div>
-        );
-      }}
-    />
-  );
-};
+const EvaluationField = ({ control, name }: EvaluationFieldProps) => (
+  <FormField
+    control={control}
+    name={name}
+    render={({ field }) => (
+      <Input
+        type="number"
+        {...field}
+        step={0.1}
+        min={0}
+        max={1}
+        onChange={(e) => {
+          field.onChange(Number(e.target.value));
+        }}
+      />
+    )}
+  />
+);
 
 const evaluationCriteria = {
   fondo: ["Responde a la pregunta del debate", "Otras Evaluaion"],
@@ -148,51 +73,32 @@ const evaluationCriteria = {
   ],
 };
 
-const formSchema = z
-  .object({
-    ronda: z.number().min(1),
-    aula: z.number().min(1),
-    equipoAF: z.string(),
-    equipoEC: z.string(),
-    mejorOradorId: z.string().optional(),
-    mejorIntoductorId: z.string().optional(),
-    mejorR1Id: z.string().optional(),
-    mejorR2Id: z.string().optional(),
-    mejorConcluId: z.string().optional(),
-    fondo: z.object({
-      AF: z.array(z.number().min(0).max(1)),
-      EC: z.array(z.number().min(0).max(1)),
-    }),
-    forma: z.object({
-      AF: z.array(z.number().min(0).max(1)),
-      EC: z.array(z.number().min(0).max(1)),
-    }),
-    otros: z.object({
-      AF: z.array(z.number().min(0).max(1)),
-      EC: z.array(z.number().min(0).max(1)),
-    }),
-  })
-  .refine((data) => data.equipoAF !== data.equipoEC, {
-    message: "El equipo EC no puede ser el mismo que el equipo AF",
-    path: ["equipoEC"],
-  });
+const formSchema = z.object({
+  ronda: z.number(),
+  aula: z.number(),
+  equipoAF: z.string(),
+  equipoEC: z.string(),
+  mejorOradorId: z.string().optional(),
+  mejorIntoductorId: z.string().optional(),
+  mejorR1Id: z.string().optional(),
+  mejorR2Id: z.string().optional(),
+  mejorConcluId: z.string().optional(),
+  fondo: z.object({
+    AF: z.array(z.number().min(0).max(1)),
+    EC: z.array(z.number().min(0).max(1)),
+  }),
+  forma: z.object({
+    AF: z.array(z.number().min(0).max(1)),
+    EC: z.array(z.number().min(0).max(1)),
+  }),
+  otros: z.object({
+    AF: z.array(z.number().min(0).max(1)),
+    EC: z.array(z.number().min(0).max(1)),
+  }),
+});
 
 async function onSubmit(data: z.infer<typeof formSchema>) {
   console.log(data);
-
-  // Check if debate already exists for this ronda and aula
-  const checkResponse = await fetch(
-    `/api/debate/check?ronda=${data.ronda}&aula=${data.aula}`
-  );
-
-  if (checkResponse.status === 200) {
-    // Debate exists
-    const existingDebate = await checkResponse.json();
-    throw new Error(
-      `Ya existe un debate en la ronda ${data.ronda}, aula ${data.aula} entre ${existingDebate.teamAF.name} y ${existingDebate.teamEC.name}`
-    );
-  }
-
   const fondoAF = data.fondo.AF.reduce((a, b) => a + b, 0);
   const fondoEC = data.fondo.EC.reduce((a, b) => a + b, 0);
 
@@ -262,11 +168,11 @@ export default function Home() {
       aula: 1,
       equipoAF: "",
       equipoEC: "",
-      mejorOradorId: undefined,
-      mejorIntoductorId: undefined,
-      mejorR1Id: undefined,
-      mejorR2Id: undefined,
-      mejorConcluId: undefined,
+      mejorOradorId: "",
+      mejorIntoductorId: "",
+      mejorR1Id: "",
+      mejorR2Id: "",
+      mejorConcluId: "",
       fondo: {
         AF: Array(evaluationCriteria.fondo.length).fill(0),
         EC: Array(evaluationCriteria.fondo.length).fill(0),
@@ -302,24 +208,7 @@ export default function Home() {
       const selectedAF = form.getValues("equipoAF");
       const selectedEC = form.getValues("equipoEC");
 
-      // Reset EC team if it's the same as AF team
-      if (selectedAF && selectedAF === selectedEC) {
-        form.setValue("equipoEC", "");
-        return;
-      }
-
-      if (!selectedAF || !selectedEC) {
-        // Reset team members and role members if either team is not selected
-        setTeamMembers([]);
-        setRoleMembers({
-          INTRO: [],
-          R1: [],
-          R2: [],
-          CONCLU: [],
-        });
-        setEligibleOrators([]);
-        return;
-      }
+      if (!selectedAF || !selectedEC) return;
 
       try {
         const response = await fetch(
@@ -350,73 +239,185 @@ export default function Home() {
     CONCLU: [],
   });
 
-  // State for eligible orators (excluding those with only CAPITAN role)
-  const [eligibleOrators, setEligibleOrators] = useState<TeamMember[]>([]);
-
   // Filter team members by role when they are loaded
   useEffect(() => {
     if (!teamMembers.length) return;
 
-    // Get selected team names
-    const selectedAFName = form.getValues("equipoAF");
-    const selectedECName = form.getValues("equipoEC");
+    // Filter team members by their roles
+    const filteredMembers = {
+      INTRO: teamMembers.filter((member) =>
+        member.roles.some((role) => role.role === "INTRO")
+      ),
+      R1: teamMembers.filter((member) =>
+        member.roles.some((role) => role.role === "R1")
+      ),
+      R2: teamMembers.filter((member) =>
+        member.roles.some((role) => role.role === "R2")
+      ),
+      CONCLU: teamMembers.filter((member) =>
+        member.roles.some((role) => role.role === "CONCLU")
+      ),
+    };
 
-    // Find team IDs based on team names
-    const teamAF = teams.find((team) => team.name === selectedAFName);
-    const teamEC = teams.find((team) => team.name === selectedECName);
+    setRoleMembers(filteredMembers);
+  }, [teamMembers]);
 
-    if (!teamAF || !teamEC) return;
+  // Filter team members by role and teamType
+  useEffect(() => {
+    if (!teamMembers.length) return;
 
-    // Filter eligible orators (exclude members who ONLY have CAPITAN role)
-    const orators = teamMembers.filter((member) => {
-      // If the member has no roles, exclude them
-      if (member.roles.length === 0) return false;
-
-      // If all their roles are CAPITAN, exclude them
-      const onlyCapitan = member.roles.every((role) => role.role === "CAPITAN");
-      return !onlyCapitan;
-    });
-
-    setEligibleOrators(orators);
-
-    // Filter team members by their roles and team type
+    // Filter team members by their roles and teamType
     const filteredMembers = {
       INTRO: teamMembers.filter((member) =>
         member.roles.some(
           (role) =>
             role.role === "INTRO" &&
-            ((member.teamId === teamAF.id && role.teamType === "AF") ||
-              (member.teamId === teamEC.id && role.teamType === "EC"))
+            (role.teamType === "AF" || role.teamType === "EC")
         )
       ),
       R1: teamMembers.filter((member) =>
         member.roles.some(
           (role) =>
             role.role === "R1" &&
-            ((member.teamId === teamAF.id && role.teamType === "AF") ||
-              (member.teamId === teamEC.id && role.teamType === "EC"))
+            (role.teamType === "AF" || role.teamType === "EC")
         )
       ),
       R2: teamMembers.filter((member) =>
         member.roles.some(
           (role) =>
             role.role === "R2" &&
-            ((member.teamId === teamAF.id && role.teamType === "AF") ||
-              (member.teamId === teamEC.id && role.teamType === "EC"))
+            (role.teamType === "AF" || role.teamType === "EC")
         )
       ),
       CONCLU: teamMembers.filter((member) =>
         member.roles.some(
           (role) =>
             role.role === "CONCLU" &&
-            ((member.teamId === teamAF.id && role.teamType === "AF") ||
-              (member.teamId === teamEC.id && role.teamType === "EC"))
+            (role.teamType === "AF" || role.teamType === "EC")
         )
       ),
     };
 
     setRoleMembers(filteredMembers);
-  }, [teamMembers, form, teams]);
+  }, [teamMembers]);
+
+  // State for role-specific members
+  const [roleMembers, setRoleMembers] = useState<{
+    INTRO: TeamMember[];
+    R1: TeamMember[];
+    R2: TeamMember[];
+    CONCLU: TeamMember[];
+  }>({
+    INTRO: [],
+    R1: [],
+    R2: [],
+    CONCLU: [],
+  });
+
+  // Filter team members by role and specific teamType
+  useEffect(() => {
+    if (!teamMembers.length) return;
+
+    const selectedAF = form.getValues("equipoAF");
+    const selectedEC = form.getValues("equipoEC");
+
+    // Filter team members by their role AND the specific team type they're playing in this debate
+    const filteredMembers = {
+      INTRO: teamMembers.filter((member) =>
+        member.roles.some(
+          (role) =>
+            role.role === "INTRO" &&
+            ((member.teamId === selectedAF && role.teamType === "AF") ||
+              (member.teamId === selectedEC && role.teamType === "EC"))
+        )
+      ),
+      R1: teamMembers.filter((member) =>
+        member.roles.some(
+          (role) =>
+            role.role === "R1" &&
+            ((member.teamId === selectedAF && role.teamType === "AF") ||
+              (member.teamId === selectedEC && role.teamType === "EC"))
+        )
+      ),
+      R2: teamMembers.filter((member) =>
+        member.roles.some(
+          (role) =>
+            role.role === "R2" &&
+            ((member.teamId === selectedAF && role.teamType === "AF") ||
+              (member.teamId === selectedEC && role.teamType === "EC"))
+        )
+      ),
+      CONCLU: teamMembers.filter((member) =>
+        member.roles.some(
+          (role) =>
+            role.role === "CONCLU" &&
+            ((member.teamId === selectedAF && role.teamType === "AF") ||
+              (member.teamId === selectedEC && role.teamType === "EC"))
+        )
+      ),
+    };
+
+    setRoleMembers(filteredMembers);
+  }, [teamMembers, form]);
+
+  // State for role-specific members
+  const [roleMembers, setRoleMembers] = useState<{
+    INTRO: TeamMember[];
+    R1: TeamMember[];
+    R2: TeamMember[];
+    CONCLU: TeamMember[];
+  }>({
+    INTRO: [],
+    R1: [],
+    R2: [],
+    CONCLU: [],
+  });
+
+  // Filter team members by role and team type
+  useEffect(() => {
+    if (!teamMembers.length) return;
+
+    const selectedAF = form.getValues("equipoAF");
+    const selectedEC = form.getValues("equipoEC");
+
+    // Filter members by their role AND matching team type in this debate
+    const filteredMembers = {
+      INTRO: teamMembers.filter((member) =>
+        member.roles.some(
+          (role) =>
+            role.role === "INTRO" &&
+            ((member.teamId === selectedAF && role.teamType === "AF") ||
+              (member.teamId === selectedEC && role.teamType === "EC"))
+        )
+      ),
+      R1: teamMembers.filter((member) =>
+        member.roles.some(
+          (role) =>
+            role.role === "R1" &&
+            ((member.teamId === selectedAF && role.teamType === "AF") ||
+              (member.teamId === selectedEC && role.teamType === "EC"))
+        )
+      ),
+      R2: teamMembers.filter((member) =>
+        member.roles.some(
+          (role) =>
+            role.role === "R2" &&
+            ((member.teamId === selectedAF && role.teamType === "AF") ||
+              (member.teamId === selectedEC && role.teamType === "EC"))
+        )
+      ),
+      CONCLU: teamMembers.filter((member) =>
+        member.roles.some(
+          (role) =>
+            role.role === "CONCLU" &&
+            ((member.teamId === selectedAF && role.teamType === "AF") ||
+              (member.teamId === selectedEC && role.teamType === "EC"))
+        )
+      ),
+    };
+
+    setRoleMembers(filteredMembers);
+  }, [teamMembers, form]);
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
@@ -426,11 +427,6 @@ export default function Home() {
       // Reset form
       form.reset({
         ...form.getValues(),
-        mejorOradorId: undefined,
-        mejorIntoductorId: undefined,
-        mejorR1Id: undefined,
-        mejorR2Id: undefined,
-        mejorConcluId: undefined,
         fondo: {
           AF: Array(evaluationCriteria.fondo.length).fill(0),
           EC: Array(evaluationCriteria.fondo.length).fill(0),
@@ -530,28 +526,19 @@ export default function Home() {
               <FormItem>
                 <FormLabel>Equipo EC</FormLabel>
                 <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={!form.getValues("equipoAF")}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona un equipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      {teams
-                        .filter(
-                          (team) => team.name !== form.getValues("equipoAF")
-                        )
-                        .map((team) => (
-                          <SelectItem key={team.id} value={team.name}>
-                            {team.name}
-                          </SelectItem>
-                        ))}
+                      {teams.map((team) => (
+                        <SelectItem key={team.id} value={team.name}>
+                          {team.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -565,13 +552,13 @@ export default function Home() {
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
-                    disabled={eligibleOrators.length === 0}
+                    disabled={teamMembers.length === 0}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Selecciona el mejor orador" />
                     </SelectTrigger>
                     <SelectContent>
-                      {eligibleOrators.map((member) => (
+                      {teamMembers.map((member) => (
                         <SelectItem key={member.id} value={member.id}>
                           {member.name}
                         </SelectItem>
