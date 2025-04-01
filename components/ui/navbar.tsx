@@ -29,12 +29,7 @@ export function Navbar() {
           >
             Evaluar
           </Link>
-          <Link
-            href="/admin"
-            className="text-sm font-medium hover:text-accent-foreground"
-          >
-            Admin
-          </Link>
+
           <DropdownMenu open={teamsOpen} onOpenChange={setTeamsOpen}>
             <DropdownMenuTrigger
               className="text-sm font-medium hover:text-accent-foreground "
