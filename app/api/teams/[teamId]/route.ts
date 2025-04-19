@@ -2,12 +2,12 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: { teamId: string } }
-) {
+export async function DELETE(request: Request) {
   try {
-    const { teamId } = params;
+    // Extract the teamId from the URL
+    const url = new URL(request.url);
+    const pathSegments = url.pathname.split("/");
+    const teamId = pathSegments[pathSegments.indexOf("teams") + 1];
 
     // Start a transaction to ensure all deletions are atomic
     await prisma.$transaction(async (prismaClient) => {

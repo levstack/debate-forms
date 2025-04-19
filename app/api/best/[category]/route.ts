@@ -12,21 +12,17 @@ const validCategories = {
 
 type Category = keyof typeof validCategories;
 
-export async function GET(
-  request: Request,
-  { params }: { params: { category: string } }
-) {
+export async function GET(request: Request) {
   try {
-    // Await params as required by Next.js
-    const category = (await params).category as Category;
+    // Extract the category from the URL
+    const url = new URL(request.url);
+    const pathSegments = url.pathname.split("/");
+    const category = pathSegments[pathSegments.indexOf("best") + 1] as Category;
 
     // Validate category
     if (!validCategories[category]) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Invalid category",
-        },
+        { success: false, error: "Invalid category" },
         { status: 400 }
       );
     }
@@ -73,12 +69,9 @@ export async function GET(
       [category]: formattedResults,
     });
   } catch (error) {
-    console.error(`Error fetching top ${(await params).category}:`, error);
+    console.error(`Error fetching top members:`, error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Internal server error",
-      },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }
