@@ -5,100 +5,100 @@ const prisma = new PrismaClient();
 // Mock team data with members and roles
 const mockTeams = [
   {
-    name: "Harvard Debaters",
+    name: "Losmen Osmalos",
     members: [
       {
-        name: "Alex Johnson",
+        name: "Elmin Ibar",
         rolesAF: ["INTRO", "CAPITAN"],
         rolesEC: ["R1"],
       },
       {
-        name: "Maria Garcia",
+        name: "Nitep Regunto",
         rolesAF: ["R1"],
         rolesEC: ["INTRO", "CAPITAN"],
       },
       {
-        name: "Daniel Lee",
+        name: "Mela Mascan",
         rolesAF: ["R2"],
         rolesEC: ["R2"],
       },
       {
-        name: "Sophia Patel",
+        name: "Bill Gates",
         rolesAF: ["CONCLU"],
         rolesEC: ["CONCLU"],
       },
     ],
   },
   {
-    name: "Oxford Union",
+    name: "La RAE",
     members: [
       {
-        name: "James Wilson",
+        name: "Pablo Motos",
         rolesAF: ["INTRO", "CAPITAN"],
         rolesEC: ["R1"],
       },
       {
-        name: "Emma Brown",
+        name: "Elpi Olin",
         rolesAF: ["R1"],
         rolesEC: ["INTRO", "CAPITAN"],
       },
       {
-        name: "Michael Taylor",
+        name: "Xinxonjuan Jan",
         rolesAF: ["R2"],
         rolesEC: ["R2"],
       },
       {
-        name: "Olivia Chen",
+        name: "Elver Galarga",
         rolesAF: ["CONCLU"],
         rolesEC: ["CONCLU"],
       },
     ],
   },
   {
-    name: "Cambridge Speakers",
+    name: "GigaBrains",
     members: [
       {
-        name: "William Adams",
+        name: "Noten Gonidea",
         rolesAF: ["INTRO", "CAPITAN"],
         rolesEC: ["R1"],
       },
       {
-        name: "Ava Martinez",
+        name: "Soyun Pickme",
         rolesAF: ["R1"],
         rolesEC: ["INTRO", "CAPITAN"],
       },
       {
-        name: "Ethan Kim",
+        name: "Mevareg Ular",
         rolesAF: ["R2"],
         rolesEC: ["R2"],
       },
       {
-        name: "Isabella Wright",
+        name: "Ermi Gue",
         rolesAF: ["CONCLU"],
         rolesEC: ["CONCLU"],
       },
     ],
   },
   {
-    name: "Princeton Debaters",
+    name: "Lope De Vergas",
     members: [
       {
-        name: "Noah Davis",
+        name: "Joaquin Nadal",
         rolesAF: ["INTRO", "CAPITAN"],
         rolesEC: ["R1"],
       },
       {
-        name: "Charlotte Singh",
+        name: "Lefas Ecas",
         rolesAF: ["R1"],
         rolesEC: ["INTRO", "CAPITAN"],
       },
       {
-        name: "Benjamin Lopez",
+        name: "Elja Jas",
         rolesAF: ["R2"],
         rolesEC: ["R2"],
       },
       {
-        name: "Amelia Thompson",
+        name: "Miguel Salguerazo",
         rolesAF: ["CONCLU"],
         rolesEC: ["CONCLU"],
       },

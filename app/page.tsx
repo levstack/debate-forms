@@ -105,7 +105,7 @@ const EvaluationField = ({ control, name }: EvaluationFieldProps) => {
               min={0}
               max={1}
               step={0.1}
-              className="w-20 pr-8"
+              className="w-18 pr-8 text-left"
             />
             <div className="right-1 top-1 flex flex-col h-[calc(100%-8px)]">
               <Button
@@ -462,112 +462,138 @@ export default function Home() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-8 flex flex-col"
+        className="space-y-6 flex flex-col w-full max-w-md mx-auto px-4 sm:px-6 md:max-w-2xl lg:max-w-4xl"
       >
         {/*Debate Properties group*/}
-        <div className="flex items-center gap-4 justify-center">
-          <FormField
-            control={form.control}
-            name="ronda"
-            render={({ field }) => (
-              <FormItem className="w-24">
-                <FormLabel htmlFor="ronda">Ronda</FormLabel>
-                <FormControl>
-                  <Input
-                    id="ronda"
-                    type="number"
-                    min={1}
-                    max={99}
-                    onChange={(e) => {
-                      field.onChange(Number(e.target.value));
-                    }}
-                    value={field.value}
-                    className="w-full"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="aula"
-            render={({ field }) => (
-              <FormItem className="w-24">
-                <FormLabel htmlFor="aula">Aula</FormLabel>
-                <FormControl>
-                  <Input
-                    id="aula"
-                    type="number"
-                    min={1}
-                    max={99}
-                    onChange={(e) => {
-                      field.onChange(Number(e.target.value));
-                    }}
-                    value={field.value}
-                    className="w-full"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="equipoAF"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="equipoAF">Equipo AF</FormLabel>
-                <FormControl>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger id="equipoAF">
-                      <SelectValue placeholder="Selecciona un equipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {teams.map((team) => (
-                        <SelectItem key={team.id} value={team.name}>
-                          {team.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="equipoEC"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel htmlFor="equipoEC">Equipo EC</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                    disabled={!form.getValues("equipoAF")}
-                  >
-                    <SelectTrigger id="equipoEC">
-                      <SelectValue placeholder="Selecciona un equipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {teams
-                        .filter(
-                          (team) => team.name !== form.getValues("equipoAF")
-                        )
-                        .map((team) => (
+        <div className="flex flex-col gap-4 w-full">
+          <div className="flex flex-row items-center gap-2 w-full">
+            <FormField
+              control={form.control}
+              name="ronda"
+              render={({ field }) => (
+                <FormItem className="w-20">
+                  <FormLabel htmlFor="ronda">Ronda</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="ronda"
+                      type="number"
+                      min={1}
+                      max={99}
+                      onChange={(e) => {
+                        // Allow empty values during editing
+                        const value =
+                          e.target.value === "" ? "" : Number(e.target.value);
+                        field.onChange(value);
+                      }}
+                      onBlur={(e) => {
+                        // Enforce minimum value of 1 when field loses focus
+                        const value =
+                          e.target.value === "" ? 1 : Number(e.target.value);
+                        const validValue = Math.max(1, value);
+                        field.onChange(validValue);
+                        field.onBlur(); // Call the original onBlur handler
+                      }}
+                      value={field.value}
+                      className="w-full"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="aula"
+              render={({ field }) => (
+                <FormItem className="w-20">
+                  <FormLabel htmlFor="aula">Aula</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="aula"
+                      type="number"
+                      min={1}
+                      max={99}
+                      onChange={(e) => {
+                        // Allow empty values during editing
+                        const value =
+                          e.target.value === "" ? "" : Number(e.target.value);
+                        field.onChange(value);
+                      }}
+                      onBlur={(e) => {
+                        // Enforce minimum value of 1 when field loses focus
+                        const value =
+                          e.target.value === "" ? 1 : Number(e.target.value);
+                        const validValue = Math.max(1, value);
+                        field.onChange(validValue);
+                        field.onBlur(); // Call the original onBlur handler
+                      }}
+                      value={field.value}
+                      className="w-full"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
+            <FormField
+              control={form.control}
+              name="equipoAF"
+              render={({ field }) => (
+                <FormItem className="w-full sm:flex-1">
+                  <FormLabel htmlFor="equipoAF">Equipo AF</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger id="equipoAF">
+                        <SelectValue placeholder="Selecciona un equipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {teams.map((team) => (
                           <SelectItem key={team.id} value={team.name}>
                             {team.name}
                           </SelectItem>
                         ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="equipoEC"
+              render={({ field }) => (
+                <FormItem className="w-full sm:flex-1">
+                  <FormLabel htmlFor="equipoEC">Equipo EC</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={!form.getValues("equipoAF")}
+                    >
+                      <SelectTrigger id="equipoEC">
+                        <SelectValue placeholder="Selecciona un equipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {teams
+                          .filter(
+                            (team) => team.name !== form.getValues("equipoAF")
+                          )
+                          .map((team) => (
+                            <SelectItem key={team.id} value={team.name}>
+                              {team.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
         {/*Mejor posicion group*/}
-        <div className="grid grid-cols-2 grid-rows-3 gap-4 mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
           <FormField
             control={form.control}
             name="mejorIntroductorId"
@@ -691,7 +717,7 @@ export default function Home() {
             control={form.control}
             name="mejorOradorId"
             render={({ field }) => (
-              <FormItem className="col-span-2 flex flex-col items-center">
+              <FormItem className="col-span-1 sm:col-span-2 flex flex-col items-center">
                 <FormLabel htmlFor="mejorOrador">Mejor Orador</FormLabel>
                 <FormControl>
                   <Select
@@ -699,7 +725,10 @@ export default function Home() {
                     value={field.value}
                     disabled={eligibleOrators.length === 0}
                   >
-                    <SelectTrigger id="mejorOrador">
+                    <SelectTrigger
+                      id="mejorOrador"
+                      className="w-full sm:w-auto"
+                    >
                       <SelectValue placeholder="Selecciona el mejor orador" />
                     </SelectTrigger>
                     <SelectContent>
@@ -721,102 +750,129 @@ export default function Home() {
         >
           Oradores destacados
         </div>
-        <Table className="w-full">
-          <TableCaption>Evaluaciones</TableCaption>
 
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[40%]">Fondo</TableHead>
-              <TableHead className="w-[30%]">Equipo AF</TableHead>
-              <TableHead className="w-[30%]">Equipo EC</TableHead>
-            </TableRow>
-          </TableHeader>
+        {/* Mobile-friendly table with responsive design */}
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="inline-block min-w-full align-middle">
+            <Table className="min-w-full text-sm sm:text-base table-fixed">
+              <TableCaption>Evaluaciones</TableCaption>
 
-          <TableBody>
-            {evaluationCriteria.fondo.map((criterion, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium whitespace-normal">
-                  {criterion}
-                </TableCell>
-                <TableCell className="text-center">
-                  <EvaluationField
-                    control={form.control}
-                    name={`fondo.AF.${index}`}
-                  />
-                </TableCell>
-                <TableCell className="text-center">
-                  <EvaluationField
-                    control={form.control}
-                    name={`fondo.EC.${index}`}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50%] sm:w-[40%] text-xs sm:text-sm break-words">
+                    Fondo
+                  </TableHead>
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                    Equipo AF
+                  </TableHead>
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                    Equipo EC
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
 
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[40%]">Forma</TableHead>
-              <TableHead className="w-[30%]">Equipo AF</TableHead>
-              <TableHead className="w-[30%]">Equipo EC</TableHead>
-            </TableRow>
-          </TableHeader>
+              <TableBody>
+                {evaluationCriteria.fondo.map((criterion, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium whitespace-normal text-xs sm:text-sm break-words p-1 sm:p-2">
+                      {criterion}
+                    </TableCell>
+                    <TableCell className="text-center p-1 sm:p-2">
+                      <EvaluationField
+                        control={form.control}
+                        name={`fondo.AF.${index}`}
+                      />
+                    </TableCell>
+                    <TableCell className="text-center p-1 sm:p-2">
+                      <EvaluationField
+                        control={form.control}
+                        name={`fondo.EC.${index}`}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
 
-          <TableBody>
-            {evaluationCriteria.forma.map((criterion, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium whitespace-normal">
-                  {criterion}
-                </TableCell>
-                <TableCell className="text-center">
-                  <EvaluationField
-                    control={form.control}
-                    name={`forma.AF.${index}`}
-                  />
-                </TableCell>
-                <TableCell className="text-center">
-                  <EvaluationField
-                    control={form.control}
-                    name={`forma.EC.${index}`}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50%] sm:w-[40%] text-xs sm:text-sm break-words">
+                    Forma
+                  </TableHead>
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                    Equipo AF
+                  </TableHead>
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                    Equipo EC
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
 
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[40%]">
-                Otros Elementos de evaluacion
-              </TableHead>
-              <TableHead className="w-[30%]">Equipo AF</TableHead>
-              <TableHead className="w-[30%]">Equipo EC</TableHead>
-            </TableRow>
-          </TableHeader>
+              <TableBody>
+                {evaluationCriteria.forma.map((criterion, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium whitespace-normal text-xs sm:text-sm break-words p-1 sm:p-2">
+                      {criterion}
+                    </TableCell>
+                    <TableCell className="text-center p-1 sm:p-2">
+                      <EvaluationField
+                        control={form.control}
+                        name={`forma.AF.${index}`}
+                      />
+                    </TableCell>
+                    <TableCell className="text-center p-1 sm:p-2">
+                      <EvaluationField
+                        control={form.control}
+                        name={`forma.EC.${index}`}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
 
-          <TableBody>
-            {evaluationCriteria.otros.map((criterion, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium whitespace-normal">
-                  {criterion}
-                </TableCell>
-                <TableCell className="text-center">
-                  <EvaluationField
-                    control={form.control}
-                    name={`otros.AF.${index}`}
-                  />
-                </TableCell>
-                <TableCell className="text-center">
-                  <EvaluationField
-                    control={form.control}
-                    name={`otros.EC.${index}`}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <Button type="submit" disabled={isSubmitting}>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50%] sm:w-[40%] text-xs sm:text-sm break-words">
+                    Otros Elementos de evaluacion
+                  </TableHead>
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                    Equipo AF
+                  </TableHead>
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                    Equipo EC
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+
+              <TableBody>
+                {evaluationCriteria.otros.map((criterion, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium whitespace-normal text-xs sm:text-sm break-words p-1 sm:p-2">
+                      {criterion}
+                    </TableCell>
+                    <TableCell className="text-center p-1 sm:p-2">
+                      <EvaluationField
+                        control={form.control}
+                        name={`otros.AF.${index}`}
+                      />
+                    </TableCell>
+                    <TableCell className="text-center p-1 sm:p-2">
+                      <EvaluationField
+                        control={form.control}
+                        name={`otros.EC.${index}`}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full sm:w-auto"
+        >
           {isSubmitting ? "Guardando..." : "Guardar"}
         </Button>
       </form>
