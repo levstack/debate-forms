@@ -137,8 +137,22 @@ const EvaluationField = ({ control, name }: EvaluationFieldProps) => {
 };
 
 const evaluationCriteria = {
-  fondo: ["Responde a la pregunta del debate", "Otras Evaluaion"],
-  forma: ["Evaluamos Forma", "Otras Evaluaion"],
+  fondo: [
+    "Responde a la pregunta del debate",
+    "Línea argumental definida y coherente dentro del equipo",
+    "Razonamientos serios y estructurados",
+    "Veracidad, profundidad y diversidad en los argumentos",
+    "Refuta los argumentos del contrario",
+    "Capacidad de improvisación",
+  ],
+  forma: [
+    "Naturalidad y expresividad",
+    "Comienzos cautivadores y finales contundentes",
+    "Dominio del espacio",
+    "Contacto visual",
+    "Dominio de la voz y silencios",
+    "Agilidad y acierto en las respuestas",
+  ],
   otros: [
     "Equilibrio entre los miembros del equipo",
     <span>
@@ -759,13 +773,13 @@ export default function Home() {
 
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50%] sm:w-[40%] text-xs sm:text-sm break-words">
+                  <TableHead className="w-[50%] sm:w-[40%] text-xs sm:text-sm break-words font-bold">
                     Fondo
                   </TableHead>
-                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm font-bold">
                     Equipo AF
                   </TableHead>
-                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm font-bold">
                     Equipo EC
                   </TableHead>
                 </TableRow>
@@ -795,13 +809,13 @@ export default function Home() {
 
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50%] sm:w-[40%] text-xs sm:text-sm break-words">
+                  <TableHead className="w-[50%] sm:w-[40%] text-xs sm:text-sm break-words font-bold">
                     Forma
                   </TableHead>
-                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm font-bold">
                     Equipo AF
                   </TableHead>
-                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm font-bold">
                     Equipo EC
                   </TableHead>
                 </TableRow>
@@ -831,13 +845,13 @@ export default function Home() {
 
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50%] sm:w-[40%] text-xs sm:text-sm break-words">
+                  <TableHead className="w-[50%] sm:w-[40%] text-xs sm:text-sm break-words font-bold">
                     Otros Elementos de evaluacion
                   </TableHead>
-                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm font-bold">
                     Equipo AF
                   </TableHead>
-                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm">
+                  <TableHead className="w-[25%] sm:w-[30%] text-xs sm:text-sm font-bold">
                     Equipo EC
                   </TableHead>
                 </TableRow>
