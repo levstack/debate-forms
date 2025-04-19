@@ -91,8 +91,8 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Debate Results</h1>
+    <div className=" mx-auto px-4 py-8 w-full">
+      <h1 className="text-2xl font-bold mb-6">Resultados</h1>
       <div className="overflow-x-auto">
         <Table className="table-auto w-full">
           <TableCaption>A list of all debate results</TableCaption>
@@ -113,7 +113,7 @@ export default function ResultsPage() {
               <TableHead>Mejor R1</TableHead>
               <TableHead>Mejor R2</TableHead>
               <TableHead>Mejor Conclu</TableHead>
-              <TableHead>Winner</TableHead>
+              <TableHead>Ganador</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -186,7 +186,7 @@ export default function ResultsPage() {
                       winner === "AF"
                         ? "text-blue-600"
                         : winner === "EC"
-                        ? "text-amber-600"
+                        ? "text-red-600"
                         : "text-gray-600"
                     }`}
                   >

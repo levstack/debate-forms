@@ -55,7 +55,7 @@ export default function BestResultsPage() {
 
   return (
     <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-8">Mejores Resultados</h1>
+      <h1 className="text-3xl font-bold mb-8">Oradores Destacados</h1>
       {loading ? (
         <p>Cargando...</p>
       ) : error ? (
