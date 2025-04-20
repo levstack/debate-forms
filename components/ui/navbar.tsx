@@ -110,7 +110,7 @@ export function Navbar() {
       <div className="px-4 py-3 flex items-center justify-between w-full md:px-10">
         <div className="flex items-center gap-3">
           <Image
-            src="/Kairos-Logo.png"
+            src="/kairos-logo.png"
             alt="logo"
             height={34}
             width={100}
