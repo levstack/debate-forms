@@ -8,13 +8,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetClose,
-} from "@/components/ui/sheet";
-import { Menu, X } from "lucide-react"; // Import icons
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react"; // Import icons
 
 export function Navbar() {
   const [teamsOpen, setTeamsOpen] = useState(false);

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 // Form schema from the frontend
-const formSchema = z.object({
+export const formSchema = z.object({
   ronda: z.number(),
   aula: z.number(),
   equipoAF: z.string(),

@@ -25,7 +25,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { PlusCircle, X, Check } from "lucide-react";
 
 // Available roles
@@ -102,7 +101,7 @@ export default function TeamsCreate() {
         throw new Error(error.message || "Error al crear el equipo");
       }
 
-      toast.success("Equipo creado exitosamente");
+      toast.success("Equipo creado correctamente");
       form.reset();
     } catch (error) {
       toast.error(

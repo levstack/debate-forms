@@ -1,5 +1,3 @@
-import { prisma } from "@/lib/prisma";
-
 export interface Team {
   id: string;
   name: string;

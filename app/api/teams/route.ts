@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     // Create team members and their roles
     for (const member of validatedData.members) {
       // Create the team member
-      // @ts-ignore - Property exists at runtime but TypeScript doesn't recognize it
+      // @ts-expect-error - Property exists at runtime but TypeScript doesn't recognize it
       const teamMember = await prisma.teamMember.create({
         data: {
           name: member.name,
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
       }));
 
       // Create all roles at once
-      // @ts-ignore - Property exists at runtime but TypeScript doesn't recognize it
+      // @ts-expect-error - Property exists at runtime but TypeScript doesn't recognize it
       await prisma.teamRole.createMany({
         data: [...afRoles, ...ecRoles],
       });

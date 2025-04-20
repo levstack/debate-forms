@@ -9,7 +9,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { useForm } from "react-hook-form";
+import { useForm, Control } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect, useRef } from "react";
@@ -27,7 +27,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectTrigger,
@@ -36,8 +35,10 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
+type FormValues = z.infer<typeof formSchema>;
+
 interface EvaluationFieldProps {
-  control: any;
+  control: Control<FormValues>;
   name: string;
 }
 
@@ -45,16 +46,17 @@ const EvaluationField = ({ control, name }: EvaluationFieldProps) => {
   const [displayValue, setDisplayValue] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Initialize display value from the field value
+  useEffect(() => {
+    const field = control._getWatch(name);
+    setDisplayValue(field?.toString().replace(".", ",") || "");
+  }, [control, name]);
+
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => {
-        // Initialize display value from the field value
-        useEffect(() => {
-          setDisplayValue(field.value.toString().replace(".", ","));
-        }, [field.value]);
-
         // Handle increment/decrement
         const handleStep = (increment: boolean) => {
           const step = 0.1;
@@ -155,11 +157,11 @@ const evaluationCriteria = {
   ],
   otros: [
     "Equilibrio entre los miembros del equipo",
-    <span>
+    <span key="respect">
       Actitud de respeto y cordialidad con el otro equipo{" "}
       <span className="font-bold">(x2)</span>
     </span>,
-    <span>
+    <span key="impression">
       Impresion general del debate <span className="font-bold">(x3)</span>
     </span>,
   ],
