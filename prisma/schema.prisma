@@ -53,7 +53,7 @@ model TeamRole {
 
 model Team {
   id          String       @id @default(cuid())
-  name        String       @unique @db.VarChar(12)
+  name        String       @unique @db.VarChar(18)
   members     TeamMember[]
   debatesAsAF Debate[]     @relation("AFTeam")
   debatesAsEC Debate[]     @relation("ECTeam")

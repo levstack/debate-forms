@@ -5,11 +5,11 @@ import { TeamType } from "@prisma/client";
 
 // Schema for team creation
 const teamFormSchema = z.object({
-  name: z.string().min(2),
+  name: z.string().min(2).max(18),
   members: z
     .array(
       z.object({
-        name: z.string().min(2),
+        name: z.string().min(2).max(16),
         rolesAF: z
           .array(z.enum(["INTRO", "R1", "R2", "CONCLU", "CAPITAN"]))
           .min(1)

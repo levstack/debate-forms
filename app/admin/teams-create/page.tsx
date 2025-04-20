@@ -36,7 +36,7 @@ const teamFormSchema = z.object({
   name: z
     .string()
     .min(2, "El nombre del equipo debe tener al menos 2 caracteres")
-    .max(12, "El nombre del equipo no puede tener más de 12 caracteres"),
+    .max(18, "El nombre del equipo no puede tener más de 18 caracteres"),
   members: z
     .array(
       z.object({
