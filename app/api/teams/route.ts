@@ -9,7 +9,7 @@ const teamFormSchema = z.object({
   members: z
     .array(
       z.object({
-        name: z.string().min(2).max(16),
+        name: z.string().min(2).max(18),
         rolesAF: z
           .array(z.enum(["INTRO", "R1", "R2", "CONCLU", "CAPITAN"]))
           .min(1)
