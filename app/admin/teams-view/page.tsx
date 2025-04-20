@@ -4,6 +4,10 @@ import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+//Forces vercel to revalidate the page every 5 seconds in order to update the teams list without caching
+export const dynamic = "force-dynamic";
+export const revalidate = 5;
+
 // Define Team type to match the component's expected props
 type TeamWithRelations = {
   id: string;
