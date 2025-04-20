@@ -39,7 +39,11 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface EvaluationFieldProps {
   control: Control<FormValues>;
-  name: string;
+  name:
+    | keyof FormValues
+    | `fondo.${"AF" | "EC"}.${number}`
+    | `forma.${"AF" | "EC"}.${number}`
+    | `otros.${"AF" | "EC"}.${number}`;
 }
 
 const EvaluationField = ({ control, name }: EvaluationFieldProps) => {
