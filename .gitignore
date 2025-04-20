@@ -60,3 +60,4 @@ ehthumbs.db
 Thumbs.db
 
 DATABASE_URL=postgresql://postgres:debate_forms@localhost:5432/postgres
+.env*.local
