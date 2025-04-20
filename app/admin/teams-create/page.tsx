@@ -35,11 +35,15 @@ type Role = (typeof ROLES)[number];
 const teamFormSchema = z.object({
   name: z
     .string()
-    .min(2, "El nombre del equipo debe tener al menos 2 caracteres"),
+    .min(2, "El nombre del equipo debe tener al menos 2 caracteres")
+    .max(12, "El nombre del equipo no puede tener más de 12 caracteres"),
   members: z
     .array(
       z.object({
-        name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+        name: z
+          .string()
+          .min(2, "El nombre debe tener al menos 2 caracteres")
+          .max(16, "El nombre no puede tener más de 16 caracteres"),
         rolesAF: z
           .array(z.enum(ROLES))
           .min(1, "Selecciona al menos un rol")
