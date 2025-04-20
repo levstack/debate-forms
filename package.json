@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -H 0.0.0.0",
-    "build": "prisma generate && next build",
-    "postinstall": "prisma generate",
+    "build": "pnpm dlx prisma generate && next build",
+    "postinstall": "pnpm dlx prisma generate",
     "start": "next start",
     "lint": "next lint",
     "purge-debates": "ts-node --project tsconfig.json scripts/purge-debates.ts",
