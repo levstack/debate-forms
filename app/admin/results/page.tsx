@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Evaluation {
   id: string;
@@ -56,6 +57,95 @@ interface Debate {
   results: Result[];
 }
 
+// Skeleton component for the table
+function ResultsTableSkeleton() {
+  return (
+    <div className="mx-auto px-4 py-8 w-full">
+      <h1 className="text-2xl font-bold mb-6">Resultados</h1>
+      <div className="overflow-x-auto">
+        <Table className="table-auto w-full">
+          <TableCaption>A list of all debate results</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Ronda</TableHead>
+              <TableHead>Aula</TableHead>
+              <TableHead>AF Team</TableHead>
+              <TableHead>EC Team</TableHead>
+              <TableHead>Fondo AF</TableHead>
+              <TableHead>Fondo EC</TableHead>
+              <TableHead>Forma AF</TableHead>
+              <TableHead>Forma EC</TableHead>
+              <TableHead>Total AF</TableHead>
+              <TableHead>Total EC</TableHead>
+              <TableHead>Mejor Orador</TableHead>
+              <TableHead>Mejor Intro</TableHead>
+              <TableHead>Mejor R1</TableHead>
+              <TableHead>Mejor R2</TableHead>
+              <TableHead>Mejor Conclu</TableHead>
+              <TableHead>Ganador</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <Skeleton className="h-4 w-8" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-8" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-12" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-12" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-12" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-12" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-12" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-12" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <Skeleton className="h-10 w-40 mt-4" />
+      </div>
+    </div>
+  );
+}
+
 export default function ResultsPage() {
   const [debates, setDebates] = useState<Debate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -87,7 +177,7 @@ export default function ResultsPage() {
   }, []);
 
   if (isLoading) {
-    return <div className="container mx-auto px-4 py-8">Loading...</div>;
+    return <ResultsTableSkeleton />;
   }
 
   return (
