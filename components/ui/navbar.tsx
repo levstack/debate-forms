@@ -12,7 +12,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Menu,
   X,
-  ChevronRight,
   Users,
   Award,
   Home,

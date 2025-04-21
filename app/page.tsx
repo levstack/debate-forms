@@ -12,11 +12,9 @@ import {
 import { useForm, Control, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Team, getAllTeams } from "@/lib/services/team-service";
-
-import { TriangleDownIcon, TriangleUpIcon } from "@radix-ui/react-icons";
 
 import {
   Form,
@@ -408,7 +406,7 @@ export default function Home() {
     }
 
     fetchTeamMembers();
-  }, [form.watch("equipoAF"), form.watch("equipoEC")]);
+  }, [form]);
 
   // State for role-specific members
   const [roleMembers, setRoleMembers] = useState<{
