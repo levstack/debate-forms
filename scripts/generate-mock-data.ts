@@ -1,6 +1,7 @@
 import { PrismaClient, Role, TeamType } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient().$extends(withAccelerate());
 
 // Mock team data with members and roles
 const mockTeams = [
