@@ -144,12 +144,12 @@ function generateMockDebates(teams: any[]) {
         mejorR2Id: getRandomMember(afTeam, ecTeam),
         mejorConcluId: getRandomMember(afTeam, ecTeam),
         fondo: {
-          AF: generateRandomScores(2),
-          EC: generateRandomScores(2),
+          AF: generateRandomScores(6),
+          EC: generateRandomScores(6),
         },
         forma: {
-          AF: generateRandomScores(2),
-          EC: generateRandomScores(2),
+          AF: generateRandomScores(6),
+          EC: generateRandomScores(6),
         },
         otros: {
           AF: generateRandomScores(3),
@@ -171,6 +171,40 @@ function getRandomTeamIndices(teamCount: number): number[] {
     second = Math.floor(Math.random() * teamCount);
   }
   return [first, second];
+}
+
+// Helper functions to get criteria names
+function getFondoCriteria(index: number): string {
+  const criteria = [
+    "Responde a la pregunta del debate",
+    "Línea argumental definida y coherente dentro del equipo",
+    "Razonamientos serios y estructurados",
+    "Veracidad, profundidad y diversidad en los argumentos",
+    "Refuta los argumentos del contrario",
+    "Capacidad de improvisación",
+  ];
+  return criteria[index] || "Criterio no definido";
+}
+
+function getFormaCriteria(index: number): string {
+  const criteria = [
+    "Naturalidad y expresividad",
+    "Comienzos cautivadores y finales contundentes",
+    "Dominio del espacio",
+    "Contacto visual",
+    "Dominio de la voz y silencios",
+    "Agilidad y acierto en las respuestas",
+  ];
+  return criteria[index] || "Criterio no definido";
+}
+
+function getOtrosCriteria(index: number): string {
+  const criteria = [
+    "Equilibrio entre los miembros del equipo",
+    "Actitud de respeto y cordialidad con el otro equipo",
+    "Impresion general del debate",
+  ];
+  return criteria[index] || "Criterio no definido";
 }
 
 // Get random member ID from the teams for best speaker awards
@@ -316,10 +350,7 @@ async function main() {
           resultId: result.id,
           category: "FONDO" as const,
           team: "AF" as const,
-          criteria:
-            index === 0
-              ? "Responde a la pregunta del debate"
-              : "Otras Evaluaion",
+          criteria: getFondoCriteria(index),
           score,
           weight: 1,
         })
@@ -330,10 +361,7 @@ async function main() {
           resultId: result.id,
           category: "FONDO" as const,
           team: "EC" as const,
-          criteria:
-            index === 0
-              ? "Responde a la pregunta del debate"
-              : "Otras Evaluaion",
+          criteria: getFondoCriteria(index),
           score,
           weight: 1,
         })
@@ -345,7 +373,7 @@ async function main() {
           resultId: result.id,
           category: "FORMA" as const,
           team: "AF" as const,
-          criteria: index === 0 ? "Evaluamos Forma" : "Otras Evaluaion",
+          criteria: getFormaCriteria(index),
           score,
           weight: 1,
         })
@@ -356,7 +384,7 @@ async function main() {
           resultId: result.id,
           category: "FORMA" as const,
           team: "EC" as const,
-          criteria: index === 0 ? "Evaluamos Forma" : "Otras Evaluaion",
+          criteria: getFormaCriteria(index),
           score,
           weight: 1,
         })
@@ -368,12 +396,7 @@ async function main() {
           resultId: result.id,
           category: "OTROS" as const,
           team: "AF" as const,
-          criteria:
-            index === 0
-              ? "Equilibrio entre los miembros del equipo"
-              : index === 1
-              ? "Actitud de respeto y cordialidad con el otro equipo"
-              : "Impresion general del debate",
+          criteria: getOtrosCriteria(index),
           score,
           weight: index === 0 ? 1 : index === 1 ? 2 : 3,
         })
@@ -384,12 +407,7 @@ async function main() {
           resultId: result.id,
           category: "OTROS" as const,
           team: "EC" as const,
-          criteria:
-            index === 0
-              ? "Equilibrio entre los miembros del equipo"
-              : index === 1
-              ? "Actitud de respeto y cordialidad con el otro equipo"
-              : "Impresion general del debate",
+          criteria: getOtrosCriteria(index),
           score,
           weight: index === 0 ? 1 : index === 1 ? 2 : 3,
         })

@@ -9,7 +9,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/table";
-import { useForm, Control } from "react-hook-form";
+import { useForm, Control, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect, useRef } from "react";
@@ -34,6 +34,13 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { NumberInput } from "@/components/ui/number-input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Settings2 } from "lucide-react";
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -47,97 +54,20 @@ interface EvaluationFieldProps {
 }
 
 const EvaluationField = ({ control, name }: EvaluationFieldProps) => {
-  const [displayValue, setDisplayValue] = useState<string>("");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Initialize display value from the field value
-  useEffect(() => {
-    const field = control._getWatch(name);
-    setDisplayValue(field?.toString().replace(".", ",") || "");
-  }, [control, name]);
-
   return (
     <FormField
       control={control}
       name={name}
-      render={({ field }) => {
-        // Handle increment/decrement
-        const handleStep = (increment: boolean) => {
-          const step = 0.1;
-          const currentValue = field.value as number;
-          let newValue = increment
-            ? Math.min(currentValue + step, 1)
-            : Math.max(currentValue - step, 0);
-
-          // Round to 1 decimal place to avoid floating point issues
-          newValue = Math.round(newValue * 10) / 10;
-          field.onChange(newValue);
-        };
-
-        return (
-          <div className="relative flex items-center">
-            <Input
-              ref={inputRef}
-              type="text"
-              inputMode="decimal"
-              value={displayValue}
-              onFocus={() => {
-                if (field.value === 0) {
-                  setDisplayValue("0,");
-                }
-              }}
-              onBlur={() => {
-                const valueForParsing = displayValue.replace(",", ".");
-                const numValue = parseFloat(valueForParsing);
-                const clampedValue = Math.min(
-                  Math.max(isNaN(numValue) ? 0 : numValue, 0),
-                  1
-                );
-                field.onChange(clampedValue);
-                setDisplayValue(clampedValue.toString().replace(".", ","));
-              }}
-              onChange={(e) => {
-                const inputValue = e.target.value;
-                const normalizedInput = inputValue.replace(".", ",");
-                if (/^[0-9]*,?[0-9]*$/.test(normalizedInput)) {
-                  setDisplayValue(normalizedInput);
-                  const valueForParsing = normalizedInput.replace(",", ".");
-                  const numValue = parseFloat(valueForParsing);
-                  if (!isNaN(numValue)) {
-                    field.onChange(numValue);
-                  }
-                }
-              }}
-              min={0}
-              max={1}
-              step={0.1}
-              className="w-18 pr-8 text-left"
-            />
-            <div className="right-1 top-1 flex flex-col h-[calc(100%-8px)]">
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-4 w-4 p-0 hover:bg-transparent"
-                onClick={() => handleStep(true)}
-                tabIndex={-1}
-              >
-                <TriangleUpIcon />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-4 w-4 p-0 hover:bg-transparent"
-                onClick={() => handleStep(false)}
-                tabIndex={-1}
-              >
-                <TriangleDownIcon />
-              </Button>
-            </div>
-          </div>
-        );
-      }}
+      render={({ field }) => (
+        <NumberInput
+          value={field.value as number}
+          onChange={field.onChange}
+          min={0}
+          max={1}
+          step={0.1}
+          className="w-full"
+        />
+      )}
     />
   );
 };
@@ -271,6 +201,126 @@ type TeamMember = {
     role: string;
     teamType: "AF" | "EC";
   }[];
+};
+
+// Add the DebatePropertiesPopover component
+interface DebatePropertiesPopoverProps {
+  control: Control<FormValues>;
+}
+
+const DebatePropertiesPopover = ({ control }: DebatePropertiesPopoverProps) => {
+  // Use useWatch to properly watch the form values
+  const rondaValue = useWatch({
+    control,
+    name: "ronda",
+  });
+  const aulaValue = useWatch({
+    control,
+    name: "aula",
+  });
+
+  // State to control the popover open state
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 text-sm">
+        <span className="font-medium">Ronda:</span>
+        <span>{rondaValue}</span>
+        <span className="mx-1">|</span>
+        <span className="font-medium">Aula:</span>
+        <span>{aulaValue}</span>
+      </div>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+            <Settings2 className="h-4 w-4" />
+            <span className="sr-only">Configuración de debate</span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80">
+          <div className="grid gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium leading-none">
+                Propiedades del debate
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                Configura la ronda y el aula para este debate.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={control}
+                name="ronda"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="ronda">Ronda</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="ronda"
+                        type="number"
+                        min={1}
+                        max={99}
+                        onChange={(e) => {
+                          // Allow empty values during editing
+                          const value =
+                            e.target.value === "" ? "" : Number(e.target.value);
+                          field.onChange(value);
+                        }}
+                        onBlur={(e) => {
+                          // Enforce minimum value of 1 when field loses focus
+                          const value =
+                            e.target.value === "" ? 1 : Number(e.target.value);
+                          const validValue = Math.max(1, value);
+                          field.onChange(validValue);
+                          field.onBlur(); // Call the original onBlur handler
+                        }}
+                        value={field.value}
+                        className="w-full"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="aula"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="aula">Aula</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="aula"
+                        type="number"
+                        min={1}
+                        max={99}
+                        onChange={(e) => {
+                          // Allow empty values during editing
+                          const value =
+                            e.target.value === "" ? "" : Number(e.target.value);
+                          field.onChange(value);
+                        }}
+                        onBlur={(e) => {
+                          // Enforce minimum value of 1 when field loses focus
+                          const value =
+                            e.target.value === "" ? 1 : Number(e.target.value);
+                          const validValue = Math.max(1, value);
+                          field.onChange(validValue);
+                          field.onBlur(); // Call the original onBlur handler
+                        }}
+                        value={field.value}
+                        className="w-full"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
 };
 
 export default function Home() {
@@ -487,72 +537,7 @@ export default function Home() {
         {/*Debate Properties group*/}
         <div className="flex flex-col gap-4 w-full">
           <div className="flex flex-row items-center gap-2 w-full">
-            <FormField
-              control={form.control}
-              name="ronda"
-              render={({ field }) => (
-                <FormItem className="w-20">
-                  <FormLabel htmlFor="ronda">Ronda</FormLabel>
-                  <FormControl>
-                    <Input
-                      id="ronda"
-                      type="number"
-                      min={1}
-                      max={99}
-                      onChange={(e) => {
-                        // Allow empty values during editing
-                        const value =
-                          e.target.value === "" ? "" : Number(e.target.value);
-                        field.onChange(value);
-                      }}
-                      onBlur={(e) => {
-                        // Enforce minimum value of 1 when field loses focus
-                        const value =
-                          e.target.value === "" ? 1 : Number(e.target.value);
-                        const validValue = Math.max(1, value);
-                        field.onChange(validValue);
-                        field.onBlur(); // Call the original onBlur handler
-                      }}
-                      value={field.value}
-                      className="w-full"
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="aula"
-              render={({ field }) => (
-                <FormItem className="w-20">
-                  <FormLabel htmlFor="aula">Aula</FormLabel>
-                  <FormControl>
-                    <Input
-                      id="aula"
-                      type="number"
-                      min={1}
-                      max={99}
-                      onChange={(e) => {
-                        // Allow empty values during editing
-                        const value =
-                          e.target.value === "" ? "" : Number(e.target.value);
-                        field.onChange(value);
-                      }}
-                      onBlur={(e) => {
-                        // Enforce minimum value of 1 when field loses focus
-                        const value =
-                          e.target.value === "" ? 1 : Number(e.target.value);
-                        const validValue = Math.max(1, value);
-                        field.onChange(validValue);
-                        field.onBlur(); // Call the original onBlur handler
-                      }}
-                      value={field.value}
-                      className="w-full"
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <DebatePropertiesPopover control={form.control} />
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
             <FormField
@@ -771,8 +756,8 @@ export default function Home() {
           Oradores destacados
         </div>
 
-        {/* Mobile-friendly table with responsive design */}
-        <div className="overflow-x-auto -mx-4 sm:mx-0">
+        {/* Desktop Table View */}
+        <div className="hidden sm:block overflow-x-auto -mx-4 sm:mx-0">
           <div className="inline-block min-w-full align-middle">
             <Table className="min-w-full text-sm sm:text-base table-fixed">
               <TableCaption>Evaluaciones</TableCaption>
@@ -885,6 +870,95 @@ export default function Home() {
                 ))}
               </TableBody>
             </Table>
+          </div>
+        </div>
+
+        {/* Mobile Stacked View */}
+        <div className="sm:hidden space-y-8">
+          {/* Fondo Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Fondo</h3>
+            <div className="space-y-4">
+              {evaluationCriteria.fondo.map((criterion, index) => (
+                <div key={index} className="space-y-2">
+                  <p className="text-sm font-medium">{criterion}</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Equipo AF</p>
+                      <EvaluationField
+                        control={form.control}
+                        name={`fondo.AF.${index}`}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Equipo EC</p>
+                      <EvaluationField
+                        control={form.control}
+                        name={`fondo.EC.${index}`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Forma Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Forma</h3>
+            <div className="space-y-4">
+              {evaluationCriteria.forma.map((criterion, index) => (
+                <div key={index} className="space-y-2">
+                  <p className="text-sm font-medium">{criterion}</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Equipo AF</p>
+                      <EvaluationField
+                        control={form.control}
+                        name={`forma.AF.${index}`}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Equipo EC</p>
+                      <EvaluationField
+                        control={form.control}
+                        name={`forma.EC.${index}`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Otros Section */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">
+              Otros Elementos de evaluación
+            </h3>
+            <div className="space-y-4">
+              {evaluationCriteria.otros.map((criterion, index) => (
+                <div key={index} className="space-y-2">
+                  <p className="text-sm font-medium">{criterion}</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Equipo AF</p>
+                      <EvaluationField
+                        control={form.control}
+                        name={`otros.AF.${index}`}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs text-muted-foreground">Equipo EC</p>
+                      <EvaluationField
+                        control={form.control}
+                        name={`otros.EC.${index}`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
