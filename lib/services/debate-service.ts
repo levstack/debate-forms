@@ -103,8 +103,22 @@ async function getOrCreateTeam(name: string) {
 }
 
 const criteriaMap = {
-  FONDO: ["Responde a la pregunta del debate", "Otras Evaluaion"],
-  FORMA: ["Evaluamos Forma", "Otras Evaluaion"],
+  FONDO: [
+    "Responde a la pregunta del debate",
+    "Línea argumental definida y coherente dentro del equipo",
+    "Razonamientos serios y estructurados",
+    "Veracidad, profundidad y diversidad en los argumentos",
+    "Refuta los argumentos del contrario",
+    "Capacidad de improvisación",
+  ],
+  FORMA: [
+    "Naturalidad y expresividad",
+    "Comienzos cautivadores y finales contundentes",
+    "Dominio del espacio",
+    "Contacto visual",
+    "Dominio de la voz y silencios",
+    "Agilidad y acierto en las respuestas",
+  ],
   OTROS: [
     "Equilibrio entre los miembros del equipo",
     "Actitud de respeto y cordialidad con el otro equipo",
