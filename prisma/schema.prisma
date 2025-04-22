@@ -123,3 +123,57 @@ enum TeamType {
   AF
   EC
 }
+
+model User {
+  id            String    @id @default(cuid()) @map("id")
+  name          String    // Required for display purposes
+  email         String    @unique // Required for authentication
+  emailVerified Boolean   @default(false)
+  image         String?   // Optional profile image
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                    String  @id @default(cuid()) @map("id")
+  userId                String  @map("user_id")
+  accountId             String
+  providerId            String
+  accessToken           String?   // Optional as it depends on provider
+  refreshToken          String?   // Optional as it depends on provider
+  accessTokenExpiresAt  DateTime? // Optional as it depends on provider
+  refreshTokenExpiresAt DateTime? // Optional as it depends on provider
+  scope                 String?   // Optional as it depends on provider
+  idToken               String?   // Optional as it depends on provider
+  password              String?   // Optional as it's only used for email/password auth
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+}
+
+model Session {
+  id         String   @id @default(cuid()) @map("id")
+  userId     String   @map("user_id")
+  token      String   @unique
+  expiresAt  DateTime
+  ipAddress  String?  // Optional as it might not always be available
+  userAgent  String?  // Optional as it might not always be available
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Verification {
+  id         String   @id @default(cuid()) @map("id")
+  identifier String   // Required for verification
+  value      String   // Required for verification
+  expiresAt  DateTime // Required for security
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+}
