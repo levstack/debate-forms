@@ -530,7 +530,7 @@ export default function Home() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-6 flex flex-col w-full max-w-md mx-auto px-4 sm:px-6 md:max-w-2xl lg:max-w-4xl"
+        className="space-y-6 flex flex-col w-full max-w-4xl mx-auto"
       >
         {/*Debate Properties group*/}
         <div className="flex flex-col gap-4 w-full">
