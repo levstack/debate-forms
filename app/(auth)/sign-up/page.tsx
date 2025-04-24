@@ -38,7 +38,7 @@ export default function SignUpPage() {
         },
         {
           onSuccess: () => {
-            router.push("/dashboard"); // Redirect to dashboard after successful signup
+            router.push("/");
           },
           onError: (ctx) => {
             setError(ctx.error.message);
