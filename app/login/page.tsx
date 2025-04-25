@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
 export default async function Login() {
@@ -21,14 +20,14 @@ export default async function Login() {
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
-            {isAuthenticated ? "Account" : "Sign In"}
+            {isAuthenticated ? "Cuenta" : "Iniciar sesión"}
           </CardTitle>
           <CardDescription className="text-center text-muted-foreground">
             {isAuthenticated
-              ? `Logged in as ${
-                  session?.user?.name || session?.user?.email || "User"
+              ? `Autenticado como ${
+                  session?.user?.name || session?.user?.email || "Usuario"
                 }`
-              : "Enter your credentials to access your account"}
+              : "Ingresa tus credenciales para acceder a tu cuenta"}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center">

@@ -88,7 +88,7 @@ export default function Home() {
         <div>
           <h1 className="text-3xl font-bold mb-2">Debates</h1>
           <p className="text-gray-500">
-            Plataforma para seguimiento de debates
+            Estos son los debates que ya hemos evaluado.
           </p>
         </div>
         <Link href="/admin/evaluate">

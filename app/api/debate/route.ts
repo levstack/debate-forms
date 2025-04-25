@@ -29,10 +29,10 @@ const formSchema = z.object({
   }),
 });
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Check if the request is from an admin
-    const isAdmin = await isAdminAuthenticated(request);
+    const isAdmin = await isAdminAuthenticated();
 
     // For public access (non-admin), return limited debate information
     // For admin access, return complete debate information including results
