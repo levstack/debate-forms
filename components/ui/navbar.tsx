@@ -34,7 +34,7 @@ export function Navbar() {
   const NavItems = ({ isMobile = false }) => (
     <>
       <Link
-        href="/"
+        href="/admin/evaluate"
         className={`text-sm font-medium hover:text-accent-foreground transition-colors ${
           isMobile ? "py-3 w-full flex items-center gap-2" : ""
         }`}
