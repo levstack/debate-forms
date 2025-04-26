@@ -250,6 +250,7 @@ async function createTeamWithMembers(teamData: any) {
       role: role as Role,
       teamType: TeamType.AF,
       memberId: teamMember.id,
+      teamId: team.id,
     }));
 
     // Create EC roles
@@ -257,6 +258,7 @@ async function createTeamWithMembers(teamData: any) {
       role: role as Role,
       teamType: TeamType.EC,
       memberId: teamMember.id,
+      teamId: team.id,
     }));
 
     // Create all roles
