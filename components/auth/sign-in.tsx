@@ -13,23 +13,12 @@ export function SignIn() {
       }}
     >
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="passkey">Passkey</Label>
         <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="your@email.com"
-          required
-          autoComplete="email"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          name="password"
+          id="passkey"
+          name="passkey"
           type="password"
-          placeholder="••••••••"
+          placeholder="Enter passkey"
           required
           autoComplete="current-password"
         />

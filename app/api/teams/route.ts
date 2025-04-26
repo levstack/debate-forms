@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { TeamType } from "@prisma/client";
-import { withAdminAuth } from "@/lib/auth-utils";
+import { withAdminOrJudgeAuth } from "@/lib/auth-utils";
 
 // Schema for team creation
 const teamFormSchema = z.object({
@@ -58,7 +58,7 @@ export async function GET() {
 
 // POST needs to be admin protected
 export async function POST(request: NextRequest) {
-  return withAdminAuth(async (req) => {
+  return withAdminOrJudgeAuth(async (req) => {
     try {
       const body = await req.json();
 

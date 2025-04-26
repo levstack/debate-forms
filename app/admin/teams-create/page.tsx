@@ -5,6 +5,9 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -70,7 +73,10 @@ const roles = [
 
 export default function TeamsCreate() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
+  // Initialize the form hook
   const form = useForm<TeamFormValues>({
     resolver: zodResolver(teamFormSchema),
     defaultValues: {
@@ -83,10 +89,33 @@ export default function TeamsCreate() {
     },
   });
 
+  // Initialize field array
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "members",
   });
+
+  // Redirect if not logged in as admin
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role !== "admin") {
+      router.push("/login");
+    }
+  }, [session, status, router]);
+
+  // Toggle role selection (add or remove)
+  const toggleRole = (
+    currentRoles: Role[],
+    role: Role,
+    onChange: (value: Role[]) => void
+  ) => {
+    if (currentRoles.includes(role)) {
+      // Remove role if already selected
+      onChange(currentRoles.filter((r) => r !== role));
+    } else if (currentRoles.length < 2) {
+      // Add role if less than 2 roles selected
+      onChange([...currentRoles, role]);
+    }
+  };
 
   const onSubmit = async (data: TeamFormValues) => {
     setIsSubmitting(true);
@@ -116,20 +145,15 @@ export default function TeamsCreate() {
     }
   };
 
-  // Toggle role selection (add or remove)
-  const toggleRole = (
-    currentRoles: Role[],
-    role: Role,
-    onChange: (value: Role[]) => void
-  ) => {
-    if (currentRoles.includes(role)) {
-      // Remove role if already selected
-      onChange(currentRoles.filter((r) => r !== role));
-    } else if (currentRoles.length < 2) {
-      // Add role if less than 2 roles selected
-      onChange([...currentRoles, role]);
-    }
-  };
+  // Loading state
+  if (status === "loading") {
+    return <div className="container mx-auto py-6">Cargando...</div>;
+  }
+
+  // No access
+  if (status === "authenticated" && session?.user?.role !== "admin") {
+    return null;
+  }
 
   return (
     <div className="container mx-auto py-6">
@@ -232,16 +256,10 @@ export default function TeamsCreate() {
                                         }
                                       >
                                         {role.label}
-                                        {field.value.includes(
-                                          role.value as Role
-                                        ) && <Check className="ml-2 h-4 w-4" />}
                                       </Button>
                                     ))}
                                   </div>
                                 </FormControl>
-                                <FormDescription>
-                                  Selecciona hasta 2 roles para la posición AF
-                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -276,16 +294,10 @@ export default function TeamsCreate() {
                                         }
                                       >
                                         {role.label}
-                                        {field.value.includes(
-                                          role.value as Role
-                                        ) && <Check className="ml-2 h-4 w-4" />}
                                       </Button>
                                     ))}
                                   </div>
                                 </FormControl>
-                                <FormDescription>
-                                  Selecciona hasta 2 roles para la posición EC
-                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -293,12 +305,12 @@ export default function TeamsCreate() {
                         </div>
                       </div>
 
-                      {fields.length > 3 && (
+                      {index > 2 && (
                         <Button
                           type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="absolute top-2 right-2"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-3 right-3"
                           onClick={() => remove(index)}
                         >
                           <X className="h-4 w-4" />
@@ -310,12 +322,34 @@ export default function TeamsCreate() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" disabled={isSubmitting} className="ml-auto">
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
-                  <>Creando equipo...</>
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Creando...
+                  </>
                 ) : (
                   <>
-                    <Check className="h-4 w-4 mr-2" />
+                    <Check className="mr-2 h-5 w-5" />
                     Crear Equipo
                   </>
                 )}

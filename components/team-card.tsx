@@ -17,6 +17,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { DeleteTeamButton } from "@/components/delete-team-button";
+import { useSession } from "next-auth/react";
 
 // Define types based on the schema
 interface TeamRole {
@@ -60,6 +62,9 @@ const getRoleLabel = (role: string) => {
 };
 
 export function TeamCard({ team }: TeamCardProps) {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "admin";
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
@@ -70,6 +75,7 @@ export function TeamCard({ team }: TeamCardProps) {
             {team.members.length === 1 ? "miembro" : "miembros"}
           </CardDescription>
         </div>
+        {isAdmin && <DeleteTeamButton teamId={team.id} teamName={team.name} />}
       </CardHeader>
       <CardContent>
         <Table>

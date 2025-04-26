@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +26,9 @@ export function Navbar() {
   const [teamsOpen, setTeamsOpen] = useState(false);
   const [resultsOpen, setResultsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
+
+  const isAdmin = session?.user?.role === "admin";
 
   // Function to close mobile menu
   const closeMobileMenu = () => {
@@ -57,14 +61,16 @@ export function Navbar() {
               Equipos
             </div>
             <div className="pl-6 flex flex-col gap-3">
-              <Link
-                href="/admin/teams-create"
-                className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
-                onClick={closeMobileMenu}
-              >
-                <Plus size={16} className="text-muted-foreground" />
-                Crear Equipo
-              </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin/teams-create"
+                  className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
+                  onClick={closeMobileMenu}
+                >
+                  <Plus size={16} className="text-muted-foreground" />
+                  Crear Equipo
+                </Link>
+              )}
               <Link
                 href="/admin/teams-view"
                 className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
@@ -127,11 +133,13 @@ export function Navbar() {
               role="menu"
               aria-label="Equipos menu"
             >
-              <DropdownMenuItem asChild>
-                <Link href="/admin/teams-create" role="menuitem">
-                  Crear Equipo
-                </Link>
-              </DropdownMenuItem>
+              {isAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link href="/admin/teams-create" role="menuitem">
+                    Crear Equipo
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem asChild>
                 <Link href="/admin/teams-view" role="menuitem">
                   Ver Equipos

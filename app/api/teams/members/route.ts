@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { withAdminAuth } from "@/lib/auth-utils";
+import { withAdminOrJudgeAuth } from "@/lib/auth-utils";
 
 export async function GET(request: NextRequest) {
-  return withAdminAuth(async (req) => {
+  return withAdminOrJudgeAuth(async (req) => {
     try {
       const searchParams = req.nextUrl.searchParams;
       const teamsParam = searchParams.get("teams");

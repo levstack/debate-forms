@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { saveDebateResult } from "@/lib/services/debate-service";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-import { withAdminAuth, isAdminAuthenticated } from "@/lib/auth-utils";
+import {
+  withAdminOrJudgeAuth,
+  isAdminOrJudgeAuthenticated,
+} from "@/lib/auth-utils";
 
 // Form validation schema
 const formSchema = z.object({
@@ -32,7 +35,7 @@ const formSchema = z.object({
 export async function GET() {
   try {
     // Check if the request is from an admin
-    const isAdmin = await isAdminAuthenticated();
+    const isAdmin = await isAdminOrJudgeAuthenticated();
 
     // For public access (non-admin), return limited debate information
     // For admin access, return complete debate information including results
@@ -79,7 +82,7 @@ export async function GET() {
 
 // Protect the POST method to ensure only admins can create debates
 export async function POST(request: NextRequest) {
-  return withAdminAuth(async (req) => {
+  return withAdminOrJudgeAuth(async (req) => {
     try {
       const body = await req.json();
       const validatedData = formSchema.parse(body);

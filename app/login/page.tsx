@@ -24,10 +24,8 @@ export default async function Login() {
           </CardTitle>
           <CardDescription className="text-center text-muted-foreground">
             {isAuthenticated
-              ? `Autenticado como ${
-                  session?.user?.name || session?.user?.email || "Usuario"
-                }`
-              : "Ingresa tus credenciales para acceder a tu cuenta"}
+              ? `Autenticado como ${session?.user?.name || "Usuario"}`
+              : "Ingresa tu passkey para acceder"}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center">
@@ -36,7 +34,7 @@ export default async function Login() {
               <div className="flex flex-col items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Badge variant="outline" className="px-4 py-2">
-                    {session?.user?.email || "No email"}
+                    {session?.user?.role || "No role"}
                   </Badge>
                 </div>
                 <SignOut />
@@ -49,12 +47,15 @@ export default async function Login() {
         {!isAuthenticated && (
           <CardFooter className="flex flex-col space-y-3 border-t px-6 py-3 text-sm text-muted-foreground">
             <div>
-              <p className="text-xs text-center">Test credentials:</p>
+              <p className="text-xs text-center">Test passkeys:</p>
               <div className="mt-2 text-center text-xs">
                 <div>
                   <p className="font-semibold">Admin</p>
-                  <p>admin@example.com</p>
-                  <p>admin123</p>
+                  <p>admin-passkey-456</p>
+                </div>
+                <div className="mt-2">
+                  <p className="font-semibold">Judge</p>
+                  <p>judge-passkey-123</p>
                 </div>
               </div>
             </div>

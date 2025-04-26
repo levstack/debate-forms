@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { withAdminAuth } from "@/lib/auth-utils";
+import { withAdminOrJudgeAuth } from "@/lib/auth-utils";
 
 // Define valid categories and their corresponding Prisma relations
 const validCategories = {
@@ -14,7 +14,7 @@ const validCategories = {
 type Category = keyof typeof validCategories;
 
 export async function GET(request: NextRequest) {
-  return withAdminAuth(async (req) => {
+  return withAdminOrJudgeAuth(async (req) => {
     try {
       // Extract the category from the URL
       const url = new URL(req.url);
