@@ -185,21 +185,19 @@ export default function ManagePage() {
                     DANGER: Complete Database Purge
                   </AlertDialogTitle>
                   <AlertDialogDescription>
-                    <p className="mb-2">
-                      This will permanently delete ALL data from the database,
-                      including:
-                    </p>
-                    <ul className="list-disc pl-6 space-y-1">
-                      <li>All teams</li>
-                      <li>All team members</li>
-                      <li>All debates</li>
-                      <li>All results</li>
-                      <li>All evaluations</li>
-                    </ul>
-                    <p className="mt-2 font-semibold">
-                      This action cannot be undone. Are you absolutely sure?
-                    </p>
+                    This will permanently delete ALL data from the database,
+                    including:
                   </AlertDialogDescription>
+                  <ul className="list-disc mt-2 pl-6 space-y-1 text-sm text-muted-foreground">
+                    <li>All teams</li>
+                    <li>All team members</li>
+                    <li>All debates</li>
+                    <li>All results</li>
+                    <li>All evaluations</li>
+                  </ul>
+                  <div className="mt-3 text-sm text-muted-foreground font-semibold">
+                    This action cannot be undone. Are you absolutely sure?
+                  </div>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel disabled={isLoading.purgeAll}>

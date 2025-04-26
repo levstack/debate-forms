@@ -65,6 +65,87 @@ export async function POST(request: NextRequest) {
       // Validate request body
       const validatedData = teamFormSchema.parse(body);
 
+      // Check if a team with the same name already exists
+      const existingTeam = await prisma.team.findUnique({
+        where: { name: validatedData.name },
+      });
+
+      if (existingTeam) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Validation error",
+            message: "Ya existe un equipo con este nombre",
+          },
+          { status: 400 }
+        );
+      }
+
+      // Validate that roles aren't duplicated within the team
+      const rolesAF = new Set();
+      const rolesEC = new Set();
+
+      for (const member of validatedData.members) {
+        for (const role of member.rolesAF) {
+          if (rolesAF.has(role)) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: "Validation error",
+                message: `El rol '${role}' en AF ya está asignado a otro miembro del equipo`,
+              },
+              { status: 400 }
+            );
+          }
+          rolesAF.add(role);
+        }
+
+        for (const role of member.rolesEC) {
+          if (rolesEC.has(role)) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: "Validation error",
+                message: `El rol '${role}' en EC ya está asignado a otro miembro del equipo`,
+              },
+              { status: 400 }
+            );
+          }
+          rolesEC.add(role);
+        }
+      }
+
+      // Check that all required roles are assigned for both AF and EC
+      const requiredRoles = ["INTRO", "R1", "R2", "CONCLU"];
+
+      // Check AF roles
+      for (const role of requiredRoles) {
+        if (!rolesAF.has(role)) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Validation error",
+              message: `Falta el rol '${role}' en la posición AF. Todos los equipos deben tener INTRO, R1, R2 y CONCLU.`,
+            },
+            { status: 400 }
+          );
+        }
+      }
+
+      // Check EC roles
+      for (const role of requiredRoles) {
+        if (!rolesEC.has(role)) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: "Validation error",
+              message: `Falta el rol '${role}' en la posición EC. Todos los equipos deben tener INTRO, R1, R2 y CONCLU.`,
+            },
+            { status: 400 }
+          );
+        }
+      }
+
       // Create team with members and roles
       const team = await prisma.team.create({
         data: {
@@ -88,6 +169,7 @@ export async function POST(request: NextRequest) {
           role,
           teamType: TeamType.AF,
           memberId: teamMember.id,
+          teamId: team.id,
         }));
 
         // Create roles for EC position
@@ -95,6 +177,7 @@ export async function POST(request: NextRequest) {
           role,
           teamType: TeamType.EC,
           memberId: teamMember.id,
+          teamId: team.id,
         }));
 
         // Create all roles at once

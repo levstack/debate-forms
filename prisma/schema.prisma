@@ -45,16 +45,20 @@ model TeamRole {
   teamType  TeamType // AF or EC
   member    TeamMember @relation(fields: [memberId], references: [id])
   memberId  String
+  team      Team       @relation(fields: [teamId], references: [id])
+  teamId    String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
   @@unique([role, teamType, memberId])
+  @@unique([role, teamType, teamId])
 }
 
 model Team {
   id          String       @id @default(cuid())
   name        String       @unique @db.VarChar(18)
   members     TeamMember[]
+  roles       TeamRole[]
   debatesAsAF Debate[]     @relation("AFTeam")
   debatesAsEC Debate[]     @relation("ECTeam")
   createdAt   DateTime     @default(now())

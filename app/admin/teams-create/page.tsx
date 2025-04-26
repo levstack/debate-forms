@@ -84,6 +84,7 @@ export default function TeamsCreate() {
         { name: "", rolesAF: ["INTRO"], rolesEC: ["INTRO"] },
         { name: "", rolesAF: ["R1"], rolesEC: ["R1"] },
         { name: "", rolesAF: ["R2"], rolesEC: ["R2"] },
+        { name: "", rolesAF: ["CONCLU"], rolesEC: ["CONCLU"] },
       ],
     },
   });
@@ -130,6 +131,26 @@ export default function TeamsCreate() {
 
       if (!response.ok) {
         const error = await response.json();
+
+        // Handle specific error for duplicate team name
+        if (error.message === "Ya existe un equipo con este nombre") {
+          form.setError("name", {
+            type: "manual",
+            message: "Ya existe un equipo con este nombre",
+          });
+          throw new Error(error.message);
+        }
+
+        // Handle role conflict errors
+        if (error.message && error.message.includes("ya está asignado")) {
+          // Show a general form error for role conflicts
+          form.setError("root", {
+            type: "manual",
+            message: error.message,
+          });
+          throw new Error(error.message);
+        }
+
         throw new Error(error.message || "Error al crear el equipo");
       }
 
@@ -164,10 +185,21 @@ export default function TeamsCreate() {
             <CardHeader>
               <CardTitle>Información del Equipo</CardTitle>
               <CardDescription>
-                Ingresa el nombre del equipo y añade entre 3 y 5 miembros
+                Ingresa el nombre del equipo y añade entre 3 y 5 miembros.
               </CardDescription>
+              <div className="mt-2 text-sm text-amber-600">
+                Importante: Cada equipo debe tener asignados los roles de
+                Introducción, Refutación 1, Refutación 2 y Conclusión tanto en
+                AF como en EC.
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {form.formState.errors.root && (
+                <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md mb-4">
+                  {form.formState.errors.root.message}
+                </div>
+              )}
+
               <FormField
                 control={form.control}
                 name="name"
