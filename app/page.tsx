@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import {
   Card,
   CardContent,
@@ -12,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { LogIn } from "lucide-react";
 
 interface Debate {
   id: string;
@@ -51,6 +53,8 @@ function DebateSkeleton() {
 export default function Home() {
   const [debates, setDebates] = useState<Debate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
 
   useEffect(() => {
     async function fetchDebates() {
@@ -91,9 +95,11 @@ export default function Home() {
             Estos son los debates que ya hemos evaluado.
           </p>
         </div>
-        <Link href="/admin/evaluate">
-          <Button size="lg">Evaluar un nuevo debate</Button>
-        </Link>
+        {isAuthenticated && (
+          <Link href="/admin/evaluate">
+            <Button size="lg">Evaluar un nuevo debate</Button>
+          </Link>
+        )}
       </div>
 
       {isLoading ? (

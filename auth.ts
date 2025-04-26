@@ -24,8 +24,8 @@ declare module "next-auth/jwt" {
 
 // Define passkeys for different roles
 const validPasskeys = {
-  judge: "judge-passkey-123",
-  admin: "admin-passkey-456",
+  judge: process.env.JUDGE_PASSKEY,
+  admin: process.env.ADMIN_PASSKEY,
 };
 
 export const { handlers, signIn, signOut, auth } = NextAuth({

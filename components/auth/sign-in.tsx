@@ -1,17 +1,36 @@
-import { signIn } from "@/auth";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useState, useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { authenticate, AuthResult } from "@/app/actions";
+import { useEffect } from "react";
 
-export function SignIn() {
+// Client component for the sign-in form
+function SignInForm() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Use action state hook for handling server actions
+  const initialState: AuthResult = { success: false };
+  const [state, formAction, isPending] = useActionState(
+    authenticate,
+    initialState
+  );
+
+  // Watch for successful authentication and redirect
+  useEffect(() => {
+    if (state.success) {
+      router.push("/");
+      router.refresh();
+    }
+    setIsLoading(isPending);
+  }, [state.success, isPending, router]);
+
   return (
-    <form
-      className="space-y-4 w-full"
-      action={async (formData) => {
-        "use server";
-        await signIn("credentials", formData);
-      }}
-    >
+    <form className="space-y-4 w-full">
       <div className="space-y-2">
         <Label htmlFor="passkey">Passkey</Label>
         <Input
@@ -21,11 +40,25 @@ export function SignIn() {
           placeholder="Enter passkey"
           required
           autoComplete="current-password"
+          disabled={isPending}
         />
       </div>
-      <Button type="submit" className="w-full mt-6">
-        Sign In
+
+      {state.message && (
+        <div className="text-red-500 text-sm">{state.message}</div>
+      )}
+
+      <Button
+        formAction={formAction}
+        className="w-full mt-6"
+        disabled={isPending}
+      >
+        {isPending ? "Signing In..." : "Sign In"}
       </Button>
     </form>
   );
+}
+
+export function SignIn() {
+  return <SignInForm />;
 }
