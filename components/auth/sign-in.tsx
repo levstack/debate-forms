@@ -22,10 +22,10 @@ function SignInForm() {
   // Watch for successful authentication and redirect
   useEffect(() => {
     if (state.success) {
-      router.push("/");
-      router.refresh();
+      // Simply redirect to homepage - NextAuth will handle session refresh
+      window.location.href = "/";
     }
-  }, [state.success, router]);
+  }, [state.success]);
 
   return (
     <form className="space-y-4 w-full">

@@ -21,6 +21,7 @@ export async function authenticate(
   formData: FormData
 ): Promise<AuthResult> {
   try {
+    // Use redirect: false to handle redirect in client component
     await signIn("credentials", {
       redirect: false,
       passkey: formData.get("passkey")?.toString(),
