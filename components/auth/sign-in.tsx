@@ -4,14 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useActionState } from "react";
-import { useRouter } from "next/navigation";
+
 import { authenticate, AuthResult } from "@/app/actions";
 import { useEffect } from "react";
 
 // Client component for the sign-in form
 function SignInForm() {
-  const router = useRouter();
-
   // Use action state hook for handling server actions
   const initialState: AuthResult = { success: false };
   const [state, formAction, isPending] = useActionState(
