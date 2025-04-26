@@ -9,7 +9,7 @@ export interface AuthResult {
 
 interface AuthError {
   type?: string;
-  [key: string]: any;
+  [key: string]: string | undefined;
 }
 
 /**

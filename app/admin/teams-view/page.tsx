@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
-import { auth } from "@/auth";
 
 //Forces vercel to revalidate the page every 5 seconds in order to update the teams list without caching
 export const dynamic = "force-dynamic";
@@ -85,22 +84,16 @@ async function TeamsList() {
     },
   })) as unknown as TeamWithRelations[];
 
-  // Check if user is admin
-  const session = await auth();
-  const isAdmin = session?.user?.role === "admin";
-
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Equipos</h1>
-        {isAdmin && (
-          <Button asChild>
-            <Link href="/admin/teams-create">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Nuevo Equipo
-            </Link>
-          </Button>
-        )}
+        <Button asChild>
+          <Link href="/admin/teams-create">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Nuevo Equipo
+          </Link>
+        </Button>
       </div>
 
       {teams.length > 0 ? (
@@ -115,14 +108,12 @@ async function TeamsList() {
           <p className="text-gray-500 mb-6">
             Aún no se han creado equipos. ¡Crea tu primer equipo para comenzar!
           </p>
-          {isAdmin && (
-            <Button asChild>
-              <Link href="/admin/teams-create">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Crear Equipo
-              </Link>
-            </Button>
-          )}
+          <Button asChild>
+            <Link href="/admin/teams-create">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Crear Equipo
+            </Link>
+          </Button>
         </div>
       )}
     </div>
@@ -130,10 +121,6 @@ async function TeamsList() {
 }
 
 export default async function TeamsView() {
-  // Check if user is admin - we pass this to the client components
-  const session = await auth();
-  const isAdmin = session?.user?.role === "admin";
-
   return (
     <Suspense fallback={<TeamsViewSkeleton />}>
       <TeamsList />
