@@ -17,7 +17,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { DeleteTeamButton } from "./delete-team-button";
 
 // Define types based on the schema
 interface TeamRole {
@@ -71,7 +70,6 @@ export function TeamCard({ team }: TeamCardProps) {
             {team.members.length === 1 ? "miembro" : "miembros"}
           </CardDescription>
         </div>
-        <DeleteTeamButton teamId={team.id} teamName={team.name} />
       </CardHeader>
       <CardContent>
         <Table>

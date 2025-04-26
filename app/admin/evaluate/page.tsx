@@ -321,6 +321,365 @@ const DebatePropertiesPopover = ({ control }: DebatePropertiesPopoverProps) => {
   );
 };
 
+// Add the TeamSelectionPopover component
+interface TeamSelectionPopoverProps {
+  control: Control<FormValues>;
+  teams: Team[];
+}
+
+const TeamSelectionPopover = ({
+  control,
+  teams,
+}: TeamSelectionPopoverProps) => {
+  // Use useWatch to properly watch the form values
+  const equipoAF = useWatch({
+    control,
+    name: "equipoAF",
+  });
+  const equipoEC = useWatch({
+    control,
+    name: "equipoEC",
+  });
+
+  // State to control the popover open state
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 text-sm max-w-[calc(100%-40px)] overflow-hidden">
+        <span className="font-medium whitespace-nowrap">Equipos:</span>
+        <span className="truncate">{equipoAF || "No seleccionado"}</span>
+        <span className="mx-1 whitespace-nowrap">vs</span>
+        <span className="truncate">{equipoEC || "No seleccionado"}</span>
+      </div>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 w-8 flex-shrink-0 p-0"
+          >
+            <Settings2 className="h-4 w-4" />
+            <span className="sr-only">Configuración de equipos</span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80">
+          <div className="grid gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium leading-none">Selección de equipos</h4>
+              <p className="text-sm text-muted-foreground">
+                Selecciona los equipos que participan en este debate.
+              </p>
+            </div>
+            <div className="grid gap-4">
+              <FormField
+                control={control}
+                name="equipoAF"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="equipoAF">Equipo AF</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger id="equipoAF">
+                          <SelectValue placeholder="Selecciona un equipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teams.map((team) => (
+                            <SelectItem key={team.id} value={team.name}>
+                              {team.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="equipoEC"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="equipoEC">Equipo EC</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        disabled={!equipoAF}
+                      >
+                        <SelectTrigger id="equipoEC">
+                          <SelectValue placeholder="Selecciona un equipo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teams
+                            .filter((team) => team.name !== equipoAF)
+                            .map((team) => (
+                              <SelectItem key={team.id} value={team.name}>
+                                {team.name}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
+
+// Add RolesSelectionPopover component
+interface RolesSelectionPopoverProps {
+  control: Control<FormValues>;
+  roleMembers: {
+    INTRO: TeamMember[];
+    R1: TeamMember[];
+    R2: TeamMember[];
+    CONCLU: TeamMember[];
+  };
+}
+
+const RolesSelectionPopover = ({
+  control,
+  roleMembers,
+}: RolesSelectionPopoverProps) => {
+  // Use useWatch to properly watch the form values
+  const mejorIntroductorId = useWatch({
+    control,
+    name: "mejorIntroductorId",
+  });
+  const mejorR1Id = useWatch({
+    control,
+    name: "mejorR1Id",
+  });
+  const mejorR2Id = useWatch({
+    control,
+    name: "mejorR2Id",
+  });
+  const mejorConcluId = useWatch({
+    control,
+    name: "mejorConcluId",
+  });
+
+  // State to control the popover open state
+  const [open, setOpen] = useState(false);
+
+  // Helper function to get member name by ID
+  const getMemberNameById = (
+    id: string | undefined,
+    members: TeamMember[]
+  ): string => {
+    if (!id) return "No seleccionado";
+    const member = members.find((m) => m.id === id);
+    return member ? member.name : "No seleccionado";
+  };
+
+  // Get shortened names for display
+  const getShortName = (name: string): string => {
+    if (name === "No seleccionado") return name;
+    // For mobile display, just show first name or first 10 chars
+    const firstName = name.split(" ")[0];
+    return firstName.length > 10
+      ? firstName.substring(0, 10) + "..."
+      : firstName;
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-2 w-full">
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 text-sm">
+          <span className="font-medium">Mejores roles:</span>
+          <span className="text-xs text-muted-foreground">
+            Seleccionar mejores posiciones
+          </span>
+        </div>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+              <Settings2 className="h-4 w-4" />
+              <span className="sr-only">Configuración de mejores roles</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <div className="grid gap-4">
+              <div className="space-y-2">
+                <h4 className="font-medium leading-none">Mejores posiciones</h4>
+                <p className="text-sm text-muted-foreground">
+                  Selecciona los mejores oradores para cada posición.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                <FormField
+                  control={control}
+                  name="mejorIntroductorId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel htmlFor="mejorIntroductor">
+                        Mejor Introductor
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={roleMembers.INTRO.length === 0}
+                        >
+                          <SelectTrigger id="mejorIntroductor">
+                            <SelectValue placeholder="Selecciona el mejor introductor" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {roleMembers.INTRO.map((member) => (
+                              <SelectItem key={member.id} value={member.id}>
+                                {member.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="mejorR1Id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel htmlFor="mejorR1">Mejor R1</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={roleMembers.R1.length === 0}
+                        >
+                          <SelectTrigger id="mejorR1">
+                            <SelectValue placeholder="Selecciona el mejor R1" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {roleMembers.R1.map((member) => (
+                              <SelectItem key={member.id} value={member.id}>
+                                {member.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="mejorR2Id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel htmlFor="mejorR2">Mejor R2</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={roleMembers.R2.length === 0}
+                        >
+                          <SelectTrigger id="mejorR2">
+                            <SelectValue placeholder="Selecciona el mejor R2" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {roleMembers.R2.map((member) => (
+                              <SelectItem key={member.id} value={member.id}>
+                                {member.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={control}
+                  name="mejorConcluId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel htmlFor="mejorConclu">
+                        Mejor Conclusión
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={roleMembers.CONCLU.length === 0}
+                        >
+                          <SelectTrigger id="mejorConclu">
+                            <SelectValue placeholder="Selecciona el mejor conclusor" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {roleMembers.CONCLU.map((member) => (
+                              <SelectItem key={member.id} value={member.id}>
+                                {member.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Responsive grid layout for selected roles: 2x2 on mobile, single row on larger screens */}
+      <div className="grid grid-cols-2 sm:flex sm:flex-row sm:items-center gap-2 sm:gap-3 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1 overflow-hidden">
+          <span>INTRO:</span>
+          <span
+            className="truncate sm:text-clip"
+            title={getMemberNameById(mejorIntroductorId, roleMembers.INTRO)}
+          >
+            {getShortName(
+              getMemberNameById(mejorIntroductorId, roleMembers.INTRO)
+            )}
+          </span>
+        </div>
+        <div className="flex items-center gap-1 overflow-hidden">
+          <span>R1:</span>
+          <span
+            className="truncate sm:text-clip"
+            title={getMemberNameById(mejorR1Id, roleMembers.R1)}
+          >
+            {getShortName(getMemberNameById(mejorR1Id, roleMembers.R1))}
+          </span>
+        </div>
+        <div className="flex items-center gap-1 overflow-hidden">
+          <span>R2:</span>
+          <span
+            className="truncate sm:text-clip"
+            title={getMemberNameById(mejorR2Id, roleMembers.R2)}
+          >
+            {getShortName(getMemberNameById(mejorR2Id, roleMembers.R2))}
+          </span>
+        </div>
+        <div className="flex items-center gap-1 overflow-hidden">
+          <span>CONCLU:</span>
+          <span
+            className="truncate sm:text-clip"
+            title={getMemberNameById(mejorConcluId, roleMembers.CONCLU)}
+          >
+            {getShortName(getMemberNameById(mejorConcluId, roleMembers.CONCLU))}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -353,6 +712,10 @@ export default function Home() {
     },
   });
 
+  // Watch form values for team selection
+  const equipoAF = useWatch({ control: form.control, name: "equipoAF" });
+  const equipoEC = useWatch({ control: form.control, name: "equipoEC" });
+
   useEffect(() => {
     async function fetchTeams() {
       try {
@@ -370,16 +733,13 @@ export default function Home() {
   // Fetch team members when teams are selected
   useEffect(() => {
     async function fetchTeamMembers() {
-      const selectedAF = form.getValues("equipoAF");
-      const selectedEC = form.getValues("equipoEC");
-
       // Reset EC team if it's the same as AF team
-      if (selectedAF && selectedAF === selectedEC) {
+      if (equipoAF && equipoAF === equipoEC) {
         form.setValue("equipoEC", "");
         return;
       }
 
-      if (!selectedAF || !selectedEC) {
+      if (!equipoAF || !equipoEC) {
         // Reset team members and role members if either team is not selected
         setTeamMembers([]);
         setRoleMembers({
@@ -394,7 +754,7 @@ export default function Home() {
 
       try {
         const response = await fetch(
-          `/api/teams/members?teams=${selectedAF},${selectedEC}`
+          `/api/teams/members?teams=${equipoAF},${equipoEC}`
         );
         if (!response.ok) throw new Error("Failed to fetch team members");
         const data = await response.json();
@@ -406,7 +766,7 @@ export default function Home() {
     }
 
     fetchTeamMembers();
-  }, [form]);
+  }, [equipoAF, equipoEC, form]);
 
   // State for role-specific members
   const [roleMembers, setRoleMembers] = useState<{
@@ -428,13 +788,9 @@ export default function Home() {
   useEffect(() => {
     if (!teamMembers.length) return;
 
-    // Get selected team names
-    const selectedAFName = form.getValues("equipoAF");
-    const selectedECName = form.getValues("equipoEC");
-
     // Find team IDs based on team names
-    const teamAF = teams.find((team) => team.name === selectedAFName);
-    const teamEC = teams.find((team) => team.name === selectedECName);
+    const teamAF = teams.find((team) => team.name === equipoAF);
+    const teamEC = teams.find((team) => team.name === equipoEC);
 
     if (!teamAF || !teamEC) return;
 
@@ -487,7 +843,7 @@ export default function Home() {
     };
 
     setRoleMembers(filteredMembers);
-  }, [teamMembers, form, teams]);
+  }, [teamMembers, equipoAF, equipoEC, teams]);
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
@@ -534,193 +890,33 @@ export default function Home() {
       >
         {/*Debate Properties group*/}
         <div className="flex flex-col gap-4 w-full">
-          <div className="flex flex-row items-center gap-2 w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
             <DebatePropertiesPopover control={form.control} />
-          </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
-            <FormField
-              control={form.control}
-              name="equipoAF"
-              render={({ field }) => (
-                <FormItem className="w-full sm:flex-1">
-                  <FormLabel htmlFor="equipoAF">Equipo AF</FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger id="equipoAF">
-                        <SelectValue placeholder="Selecciona un equipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {teams.map((team) => (
-                          <SelectItem key={team.id} value={team.name}>
-                            {team.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="equipoEC"
-              render={({ field }) => (
-                <FormItem className="w-full sm:flex-1">
-                  <FormLabel htmlFor="equipoEC">Equipo EC</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={!form.getValues("equipoAF")}
-                    >
-                      <SelectTrigger id="equipoEC">
-                        <SelectValue placeholder="Selecciona un equipo" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {teams
-                          .filter(
-                            (team) => team.name !== form.getValues("equipoAF")
-                          )
-                          .map((team) => (
-                            <SelectItem key={team.id} value={team.name}>
-                              {team.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <TeamSelectionPopover control={form.control} teams={teams} />
           </div>
         </div>
-        {/*Mejor posicion group*/}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-          <FormField
+
+        {/*Oradores destacados section*/}
+        <div className="flex flex-col items-center w-full gap-4">
+          <div
+            id="BestDescription"
+            className="text-muted-foreground text-sm mx-auto"
+          >
+            Oradores destacados
+          </div>
+
+          {/* Roles popover */}
+          <RolesSelectionPopover
             control={form.control}
-            name="mejorIntroductorId"
-            render={({ field }) => (
-              <div className="flex flex-col items-start justify-center h-full">
-                <FormItem className="w-full">
-                  <FormLabel htmlFor="mejorIntroductor">
-                    Mejor Introductor
-                  </FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={roleMembers.INTRO.length === 0}
-                    >
-                      <SelectTrigger id="mejorIntroductor">
-                        <SelectValue placeholder="Selecciona el mejor introductor" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roleMembers.INTRO.map((member) => (
-                          <SelectItem key={member.id} value={member.id}>
-                            {member.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              </div>
-            )}
+            roleMembers={roleMembers}
           />
 
-          <FormField
-            control={form.control}
-            name="mejorR1Id"
-            render={({ field }) => (
-              <div className="flex flex-col items-start justify-center h-full">
-                <FormItem className="w-full">
-                  <FormLabel htmlFor="mejorR1">Mejor R1</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={roleMembers.R1.length === 0}
-                    >
-                      <SelectTrigger id="mejorR1">
-                        <SelectValue placeholder="Selecciona el mejor R1" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roleMembers.R1.map((member) => (
-                          <SelectItem key={member.id} value={member.id}>
-                            {member.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              </div>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="mejorR2Id"
-            render={({ field }) => (
-              <div className="flex flex-col items-start justify-center h-full">
-                <FormItem className="w-full">
-                  <FormLabel htmlFor="mejorR2">Mejor R2</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={roleMembers.R2.length === 0}
-                    >
-                      <SelectTrigger id="mejorR2">
-                        <SelectValue placeholder="Selecciona el mejor R2" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roleMembers.R2.map((member) => (
-                          <SelectItem key={member.id} value={member.id}>
-                            {member.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              </div>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="mejorConcluId"
-            render={({ field }) => (
-              <div className="flex flex-col items-start justify-center h-full">
-                <FormItem className="w-full">
-                  <FormLabel htmlFor="mejorConclu">Mejor Conclusión</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      disabled={roleMembers.CONCLU.length === 0}
-                    >
-                      <SelectTrigger id="mejorConclu">
-                        <SelectValue placeholder="Selecciona el mejor conclusor" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roleMembers.CONCLU.map((member) => (
-                          <SelectItem key={member.id} value={member.id}>
-                            {member.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              </div>
-            )}
-          />
+          {/* Mejor Orador */}
           <FormField
             control={form.control}
             name="mejorOradorId"
             render={({ field }) => (
-              <FormItem className="col-span-1 sm:col-span-2 flex flex-col items-center">
+              <FormItem className="w-full sm:w-1/2 flex flex-col items-center">
                 <FormLabel htmlFor="mejorOrador">Mejor Orador</FormLabel>
                 <FormControl>
                   <Select
@@ -728,10 +924,7 @@ export default function Home() {
                     value={field.value}
                     disabled={eligibleOrators.length === 0}
                   >
-                    <SelectTrigger
-                      id="mejorOrador"
-                      className="w-full sm:w-auto"
-                    >
+                    <SelectTrigger id="mejorOrador" className="w-full">
                       <SelectValue placeholder="Selecciona el mejor orador" />
                     </SelectTrigger>
                     <SelectContent>
@@ -746,12 +939,6 @@ export default function Home() {
               </FormItem>
             )}
           />
-        </div>
-        <div
-          id="BestDescription"
-          className="text-muted-foreground mt-4 text-sm mx-auto"
-        >
-          Oradores destacados
         </div>
 
         {/* Desktop Table View */}

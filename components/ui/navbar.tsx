@@ -14,7 +14,7 @@ import {
   X,
   Users,
   Award,
-  Home,
+  FilePen,
   Plus,
   Eye,
   BarChart,
@@ -40,7 +40,7 @@ export function Navbar() {
         }`}
         onClick={isMobile ? closeMobileMenu : undefined}
       >
-        {isMobile && <Home size={18} className="text-muted-foreground" />}
+        {isMobile && <FilePen size={18} className="text-muted-foreground" />}
         Evaluar
       </Link>
 
