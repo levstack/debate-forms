@@ -44,23 +44,6 @@ export default async function Login() {
             )}
           </div>
         </CardContent>
-        {!isAuthenticated && (
-          <CardFooter className="flex flex-col space-y-3 border-t px-6 py-3 text-sm text-muted-foreground">
-            <div>
-              <p className="text-xs text-center">Test passkeys:</p>
-              <div className="mt-2 text-center text-xs">
-                <div>
-                  <p className="font-semibold">Admin</p>
-                  <p>admin-passkey-456</p>
-                </div>
-                <div className="mt-2">
-                  <p className="font-semibold">Judge</p>
-                  <p>judge-passkey-123</p>
-                </div>
-              </div>
-            </div>
-          </CardFooter>
-        )}
       </Card>
     </div>
   );
