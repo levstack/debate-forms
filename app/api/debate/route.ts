@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { saveDebateResult } from "@/lib/services/debate-service";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import {
+  withAdminOrJudgeAuth,
+  isAdminOrJudgeAuthenticated,
+} from "@/lib/auth-utils";
 
 // Form validation schema
 const formSchema = z.object({
@@ -30,20 +34,30 @@ const formSchema = z.object({
 
 export async function GET() {
   try {
+    // Check if the request is from an admin
+    const isAdmin = await isAdminOrJudgeAuthenticated();
+
+    // For public access (non-admin), return limited debate information
+    // For admin access, return complete debate information including results
     const debates = await prisma.debate.findMany({
       include: {
         teamAF: true,
         teamEC: true,
-        results: {
-          include: {
-            evaluations: true,
-            mejorOrador: true,
-            mejorIntroductor: true,
-            mejorR1: true,
-            mejorR2: true,
-            mejorConclu: true,
-          },
-        },
+        // Only include detailed results for admin users
+        ...(isAdmin
+          ? {
+              results: {
+                include: {
+                  evaluations: true,
+                  mejorOrador: true,
+                  mejorIntroductor: true,
+                  mejorR1: true,
+                  mejorR2: true,
+                  mejorConclu: true,
+                },
+              },
+            }
+          : {}),
       },
       orderBy: {
         createdAt: "desc",
@@ -66,25 +80,29 @@ export async function GET() {
   }
 }
 
+// Protect the POST method to ensure only admins can create debates
 export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const validatedData = formSchema.parse(body);
+  return withAdminOrJudgeAuth(async (req) => {
+    try {
+      const body = await req.json();
+      const validatedData = formSchema.parse(body);
 
-    const result = await saveDebateResult(validatedData);
+      const result = await saveDebateResult(validatedData);
 
-    return NextResponse.json({
-      success: true,
-      result,
-    });
-  } catch (error) {
-    console.error("Error saving debate result:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 500 }
-    );
-  }
+      return NextResponse.json({
+        success: true,
+        result,
+      });
+    } catch (error) {
+      console.error("Error saving debate result:", error);
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            error instanceof Error ? error.message : "Internal server error",
+        },
+        { status: 500 }
+      );
+    }
+  }, request);
 }

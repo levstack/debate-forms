@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,22 +10,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 import {
   Menu,
   X,
   Users,
   Award,
-  Home,
+  FilePen,
   Plus,
   Eye,
   BarChart,
   Trophy,
-} from "lucide-react"; // Import more icons
+  LogIn,
+} from "lucide-react"; // Added LogIn icon
 
 export function Navbar() {
   const [teamsOpen, setTeamsOpen] = useState(false);
   const [resultsOpen, setResultsOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const isAuthenticated = status === "authenticated";
+
+  useEffect(() => {
+    console.log("Session updated:", session);
+    setIsAdmin(session?.user?.role === "admin");
+  }, [session]);
 
   // Function to close mobile menu
   const closeMobileMenu = () => {
@@ -33,145 +44,171 @@ export function Navbar() {
 
   const NavItems = ({ isMobile = false }) => (
     <>
-      <Link
-        href="/"
-        className={`text-sm font-medium hover:text-accent-foreground transition-colors ${
-          isMobile ? "py-3 w-full flex items-center gap-2" : ""
-        }`}
-        onClick={isMobile ? closeMobileMenu : undefined}
-      >
-        {isMobile && <Home size={18} className="text-muted-foreground" />}
-        Evaluar
-      </Link>
-
-      {isMobile ? (
-        // Mobile dropdown implementation
+      {isAuthenticated ? (
         <>
-          <div
-            className="w-full py-3 border-b"
-            role="group"
-            aria-label="Equipos section"
+          <Link
+            href="/admin/evaluate"
+            className={`text-sm font-medium hover:text-accent-foreground transition-colors ${
+              isMobile ? "py-3 w-full flex items-center gap-2" : ""
+            }`}
+            onClick={isMobile ? closeMobileMenu : undefined}
           >
-            <div className="text-sm font-medium mb-2 flex items-center gap-2">
-              <Users size={18} className="text-muted-foreground" />
-              Equipos
-            </div>
-            <div className="pl-6 flex flex-col gap-3">
-              <Link
-                href="/admin/teams-create"
-                className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
-                onClick={closeMobileMenu}
+            {isMobile && (
+              <FilePen size={18} className="text-muted-foreground" />
+            )}
+            Evaluar
+          </Link>
+
+          {isMobile ? (
+            // Mobile dropdown implementation
+            <>
+              <div
+                className="w-full py-3 border-b"
+                role="group"
+                aria-label="Equipos section"
               >
-                <Plus size={16} className="text-muted-foreground" />
-                Crear Equipo
-              </Link>
-              <Link
-                href="/admin/teams-view"
-                className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
-                onClick={closeMobileMenu}
+                <div className="text-sm font-medium mb-2 flex items-center gap-2">
+                  <Users size={18} className="text-muted-foreground" />
+                  Equipos
+                </div>
+                <div className="pl-6 flex flex-col gap-3">
+                  {isAdmin && (
+                    <Link
+                      href="/admin/teams-create"
+                      className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
+                      onClick={closeMobileMenu}
+                    >
+                      <Plus size={16} className="text-muted-foreground" />
+                      Crear Equipo
+                    </Link>
+                  )}
+                  <Link
+                    href="/admin/teams-view"
+                    className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    <Eye size={16} className="text-muted-foreground" />
+                    Ver Equipos
+                  </Link>
+                </div>
+              </div>
+              <div
+                className="w-full py-3 border-b"
+                role="group"
+                aria-label="Resultados section"
               >
-                <Eye size={16} className="text-muted-foreground" />
-                Ver Equipos
-              </Link>
-            </div>
-          </div>
-          <div
-            className="w-full py-3 border-b"
-            role="group"
-            aria-label="Resultados section"
-          >
-            <div className="text-sm font-medium mb-2 flex items-center gap-2">
-              <Award size={18} className="text-muted-foreground" />
-              Resultados
-            </div>
-            <div className="pl-6 flex flex-col gap-3">
-              <Link
-                href="/admin/results"
-                className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
-                onClick={closeMobileMenu}
-              >
-                <BarChart size={16} className="text-muted-foreground" />
-                Ver Resultados
-              </Link>
-              <Link
-                href="/admin/results/best"
-                className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
-                onClick={closeMobileMenu}
-              >
-                <Trophy size={16} className="text-muted-foreground" />
-                Ver Mejores Oradores
-              </Link>
-            </div>
-          </div>
+                <div className="text-sm font-medium mb-2 flex items-center gap-2">
+                  <Award size={18} className="text-muted-foreground" />
+                  Resultados
+                </div>
+                <div className="pl-6 flex flex-col gap-3">
+                  <Link
+                    href="/admin/results"
+                    className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    <BarChart size={16} className="text-muted-foreground" />
+                    Ver Resultados
+                  </Link>
+                  <Link
+                    href="/admin/results/best"
+                    className="text-sm flex items-center gap-2 hover:text-accent-foreground transition-colors"
+                    onClick={closeMobileMenu}
+                  >
+                    <Trophy size={16} className="text-muted-foreground" />
+                    Ver Mejores Oradores
+                  </Link>
+                </div>
+              </div>
+            </>
+          ) : (
+            // Desktop dropdown implementation
+            <>
+              <DropdownMenu open={teamsOpen} onOpenChange={setTeamsOpen}>
+                <DropdownMenuTrigger
+                  className="text-sm font-medium hover:text-accent-foreground"
+                  onMouseEnter={() => setTeamsOpen(true)}
+                  onMouseLeave={() => setTeamsOpen(false)}
+                  aria-expanded={teamsOpen}
+                  aria-controls="teams-menu"
+                  aria-haspopup="true"
+                >
+                  Equipos
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  id="teams-menu"
+                  className="-mt-0.5"
+                  onMouseEnter={() => setTeamsOpen(true)}
+                  onMouseLeave={() => setTeamsOpen(false)}
+                  align="start"
+                  role="menu"
+                  aria-label="Equipos menu"
+                >
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin/teams-create" role="menuitem">
+                        Crear Equipo
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/teams-view" role="menuitem">
+                      Ver Equipos
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <DropdownMenu open={resultsOpen} onOpenChange={setResultsOpen}>
+                <DropdownMenuTrigger
+                  className="text-sm font-medium hover:text-accent-foreground"
+                  onMouseEnter={() => setResultsOpen(true)}
+                  onMouseLeave={() => setResultsOpen(false)}
+                  aria-expanded={resultsOpen}
+                  aria-controls="results-menu"
+                  aria-haspopup="true"
+                >
+                  Resultados
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  id="results-menu"
+                  className="-mt-0.5"
+                  onMouseEnter={() => setResultsOpen(true)}
+                  onMouseLeave={() => setResultsOpen(false)}
+                  align="start"
+                  role="menu"
+                  aria-label="Resultados menu"
+                >
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/results" role="menuitem">
+                      Ver Resultados
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin/results/best" role="menuitem">
+                      Ver Mejores Oradores
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )}
         </>
       ) : (
-        // Desktop dropdown implementation
-        <>
-          <DropdownMenu open={teamsOpen} onOpenChange={setTeamsOpen}>
-            <DropdownMenuTrigger
-              className="text-sm font-medium hover:text-accent-foreground"
-              onMouseEnter={() => setTeamsOpen(true)}
-              onMouseLeave={() => setTeamsOpen(false)}
-              aria-expanded={teamsOpen}
-              aria-controls="teams-menu"
-              aria-haspopup="true"
-            >
-              Equipos
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              id="teams-menu"
-              className="-mt-0.5"
-              onMouseEnter={() => setTeamsOpen(true)}
-              onMouseLeave={() => setTeamsOpen(false)}
-              align="start"
-              role="menu"
-              aria-label="Equipos menu"
-            >
-              <DropdownMenuItem asChild>
-                <Link href="/admin/teams-create" role="menuitem">
-                  Crear Equipo
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/admin/teams-view" role="menuitem">
-                  Ver Equipos
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu open={resultsOpen} onOpenChange={setResultsOpen}>
-            <DropdownMenuTrigger
-              className="text-sm font-medium hover:text-accent-foreground"
-              onMouseEnter={() => setResultsOpen(true)}
-              onMouseLeave={() => setResultsOpen(false)}
-              aria-expanded={resultsOpen}
-              aria-controls="results-menu"
-              aria-haspopup="true"
-            >
-              Resultados
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              id="results-menu"
-              className="-mt-0.5"
-              onMouseEnter={() => setResultsOpen(true)}
-              onMouseLeave={() => setResultsOpen(false)}
-              align="start"
-              role="menu"
-              aria-label="Resultados menu"
-            >
-              <DropdownMenuItem asChild>
-                <Link href="/admin/results" role="menuitem">
-                  Ver Resultados
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/admin/results/best" role="menuitem">
-                  Ver Mejores Oradores
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
+        // Login button for unauthenticated users
+        <Link
+          href="/login"
+          className={`${isMobile ? "w-full" : ""}`}
+          onClick={isMobile ? closeMobileMenu : undefined}
+        >
+          <Button
+            variant="outline"
+            size={isMobile ? "default" : "sm"}
+            className={`${isMobile ? "w-full justify-start" : ""}`}
+          >
+            <LogIn size={16} className="mr-2" />
+            Iniciar Sesión
+          </Button>
+        </Link>
       )}
     </>
   );

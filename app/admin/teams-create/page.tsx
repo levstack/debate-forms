@@ -5,12 +5,14 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -70,7 +72,10 @@ const roles = [
 
 export default function TeamsCreate() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
+  // Initialize the form hook
   const form = useForm<TeamFormValues>({
     resolver: zodResolver(teamFormSchema),
     defaultValues: {
@@ -79,42 +84,23 @@ export default function TeamsCreate() {
         { name: "", rolesAF: ["INTRO"], rolesEC: ["INTRO"] },
         { name: "", rolesAF: ["R1"], rolesEC: ["R1"] },
         { name: "", rolesAF: ["R2"], rolesEC: ["R2"] },
+        { name: "", rolesAF: ["CONCLU"], rolesEC: ["CONCLU"] },
       ],
     },
   });
 
+  // Initialize field array
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "members",
   });
 
-  const onSubmit = async (data: TeamFormValues) => {
-    setIsSubmitting(true);
-    try {
-      // Create the team in the database
-      const response = await fetch("/api/teams", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Error al crear el equipo");
-      }
-
-      toast.success("Equipo creado correctamente");
-      form.reset();
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Error al crear el equipo"
-      );
-    } finally {
-      setIsSubmitting(false);
+  // Redirect if not logged in as admin
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.role !== "admin") {
+      router.push("/login");
     }
-  };
+  }, [session, status, router]);
 
   // Toggle role selection (add or remove)
   const toggleRole = (
@@ -131,6 +117,64 @@ export default function TeamsCreate() {
     }
   };
 
+  const onSubmit = async (data: TeamFormValues) => {
+    setIsSubmitting(true);
+    try {
+      // Create the team in the database
+      const response = await fetch("/api/teams", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+
+        // Handle specific error for duplicate team name
+        if (error.message === "Ya existe un equipo con este nombre") {
+          form.setError("name", {
+            type: "manual",
+            message: "Ya existe un equipo con este nombre",
+          });
+          throw new Error(error.message);
+        }
+
+        // Handle role conflict errors
+        if (error.message && error.message.includes("ya está asignado")) {
+          // Show a general form error for role conflicts
+          form.setError("root", {
+            type: "manual",
+            message: error.message,
+          });
+          throw new Error(error.message);
+        }
+
+        throw new Error(error.message || "Error al crear el equipo");
+      }
+
+      toast.success("Equipo creado correctamente");
+      form.reset();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Error al crear el equipo"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Loading state
+  if (status === "loading") {
+    return <div className="container mx-auto py-6">Cargando...</div>;
+  }
+
+  // No access
+  if (status === "authenticated" && session?.user?.role !== "admin") {
+    return null;
+  }
+
   return (
     <div className="container mx-auto py-6">
       <h1 className="text-3xl font-bold mb-6">Crear Nuevo Equipo</h1>
@@ -141,10 +185,21 @@ export default function TeamsCreate() {
             <CardHeader>
               <CardTitle>Información del Equipo</CardTitle>
               <CardDescription>
-                Ingresa el nombre del equipo y añade entre 3 y 5 miembros
+                Ingresa el nombre del equipo y añade entre 3 y 5 miembros.
               </CardDescription>
+              <div className="mt-2 text-sm text-amber-600">
+                Importante: Cada equipo debe tener asignados los roles de
+                Introducción, Refutación 1, Refutación 2 y Conclusión tanto en
+                AF como en EC.
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {form.formState.errors.root && (
+                <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md mb-4">
+                  {form.formState.errors.root.message}
+                </div>
+              )}
+
               <FormField
                 control={form.control}
                 name="name"
@@ -232,16 +287,10 @@ export default function TeamsCreate() {
                                         }
                                       >
                                         {role.label}
-                                        {field.value.includes(
-                                          role.value as Role
-                                        ) && <Check className="ml-2 h-4 w-4" />}
                                       </Button>
                                     ))}
                                   </div>
                                 </FormControl>
-                                <FormDescription>
-                                  Selecciona hasta 2 roles para la posición AF
-                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -276,16 +325,10 @@ export default function TeamsCreate() {
                                         }
                                       >
                                         {role.label}
-                                        {field.value.includes(
-                                          role.value as Role
-                                        ) && <Check className="ml-2 h-4 w-4" />}
                                       </Button>
                                     ))}
                                   </div>
                                 </FormControl>
-                                <FormDescription>
-                                  Selecciona hasta 2 roles para la posición EC
-                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -293,12 +336,12 @@ export default function TeamsCreate() {
                         </div>
                       </div>
 
-                      {fields.length > 3 && (
+                      {index > 2 && (
                         <Button
                           type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="absolute top-2 right-2"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-3 right-3"
                           onClick={() => remove(index)}
                         >
                           <X className="h-4 w-4" />
@@ -310,12 +353,34 @@ export default function TeamsCreate() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" disabled={isSubmitting} className="ml-auto">
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
-                  <>Creando equipo...</>
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Creando...
+                  </>
                 ) : (
                   <>
-                    <Check className="h-4 w-4 mr-2" />
+                    <Check className="mr-2 h-5 w-5" />
                     Crear Equipo
                   </>
                 )}

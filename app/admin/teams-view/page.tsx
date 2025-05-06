@@ -31,10 +31,13 @@ function TeamsViewSkeleton() {
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Equipos</h1>
-        <Button disabled>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Nuevo Equipo
-        </Button>
+        {/* Button placeholder - actual visibility will be controlled by the parent */}
+        <div className="invisible">
+          <Button disabled>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Nuevo Equipo
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -117,7 +120,7 @@ async function TeamsList() {
   );
 }
 
-export default function TeamsView() {
+export default async function TeamsView() {
   return (
     <Suspense fallback={<TeamsViewSkeleton />}>
       <TeamsList />
